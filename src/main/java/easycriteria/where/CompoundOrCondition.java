@@ -12,32 +12,33 @@ import easycriteria.WhereConditionBuilder;
 import easycriteria.WhereConditionsContainer;
 import easycriteria.WhereTransformer;
 
-public class CompoundOrCondition<E, S, B extends WhereConditionsContainer> implements WhereCondition, WhereConditionsContainer {
-    
+public class CompoundOrCondition<E, S, B extends WhereConditionsContainer>
+		implements WhereCondition, WhereConditionsContainer {
+
 	private final List<WhereCondition> whereClauses;
-    private final B queryBuilder;
-    private final WhereTransformer whereTransformer;
-    private Path<E> parentPath;
-    
-    public CompoundOrCondition(B queryBuilder, WhereTransformer whereTransformer, Path<E> parentPath) {
-    	this.whereClauses = new ArrayList<>();
-        this.queryBuilder = queryBuilder;
-        this.whereTransformer = whereTransformer;
-        this.parentPath = parentPath;
-    }
-    
-    public <A> WhereConditionBuilder<E, A, S, CompoundOrCondition<E, S, B>> where(SingularAttribute<E, A> attribute) {    	    	        
-        return new WhereConditionBuilder<E, A, S, CompoundOrCondition<E, S, B>>(this, attribute, parentPath);        
-    }
-    
-    public CompoundAndCondition<E, S, CompoundOrCondition<E, S, B> > whereAnd() {
-    	return new CompoundAndCondition<E, S, CompoundOrCondition<E, S, B>>(this, whereTransformer, parentPath);
-    }    
-    
-    public B endOr(){
-    	queryBuilder.addWhereClause(this);
-    	return queryBuilder;
-    }
+	private final B queryBuilder;
+	private final WhereTransformer whereTransformer;
+	private Path<E> parentPath;
+
+	public CompoundOrCondition(B queryBuilder, WhereTransformer whereTransformer, Path<E> parentPath) {
+		this.whereClauses = new ArrayList<>();
+		this.queryBuilder = queryBuilder;
+		this.whereTransformer = whereTransformer;
+		this.parentPath = parentPath;
+	}
+
+	public <A> WhereConditionBuilder<E, A, S, CompoundOrCondition<E, S, B>> where(SingularAttribute<E, A> attribute) {
+		return new WhereConditionBuilder<E, A, S, CompoundOrCondition<E, S, B>>(this, attribute, parentPath);
+	}
+
+	public CompoundAndCondition<E, S, CompoundOrCondition<E, S, B>> whereAnd() {
+		return new CompoundAndCondition<E, S, CompoundOrCondition<E, S, B>>(this, whereTransformer, parentPath);
+	}
+
+	public B endOr() {
+		queryBuilder.addWhereClause(this);
+		return queryBuilder;
+	}
 
 	public void addWhereClause(WhereCondition whereClause) {
 		whereClauses.add(whereClause);
@@ -46,6 +47,6 @@ public class CompoundOrCondition<E, S, B extends WhereConditionsContainer> imple
 	@Override
 	public Predicate buildPredicate(CriteriaBuilder cb) {
 		Predicate[] constraints = whereTransformer.transform(whereClauses);
-		return cb.or(constraints);		
+		return cb.or(constraints);
 	}
 }
