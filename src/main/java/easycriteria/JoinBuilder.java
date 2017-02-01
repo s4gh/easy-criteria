@@ -20,15 +20,6 @@ import easycriteria.where.CompoundAndCondition;
 import easycriteria.where.CompoundOrCondition;
 import easycriteria.where.WhereCondition;
 
-/**
- * 
- * @author sveryov
- *
- * @param <E>
- * @param <A>
- * @param <S>
- * @param <B>
- */
 public class JoinBuilder<E, A, S, B extends WhereConditionsContainer>
 		implements WhereCondition, WhereConditionsContainer {
 

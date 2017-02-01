@@ -100,7 +100,7 @@ public class WhereConditionBuilder<E, A, S, B extends WhereConditionsContainer> 
 	 * parent entities without nested property (null) will not be included into
 	 * result set
 	 * 
-	 * @param nestedAttribute
+	 * @param nestedAttribute - nested attribute
 	 * @return parent builder node
 	 */
 	public <A1> WhereConditionBuilder<A, A1, S, B> nested(SingularAttribute<A, A1> nestedAttribute) {
