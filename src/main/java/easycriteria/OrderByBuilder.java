@@ -1,13 +1,11 @@
 package easycriteria;
 
-import javax.persistence.metamodel.SingularAttribute;
-
 public class OrderByBuilder<E, A, S> {
 
 	private final EasyCriteriaQuery<E, S> queryBuilder;
-	private final SingularAttribute<E, A> attribute;
+	private final String attribute;
 
-	public OrderByBuilder(EasyCriteriaQuery<E, S> queryBuilder, SingularAttribute<E, A> attribute) {
+	public OrderByBuilder(EasyCriteriaQuery<E, S> queryBuilder, String attribute) {
 		this.queryBuilder = queryBuilder;
 		this.attribute = attribute;
 	}

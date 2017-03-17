@@ -97,6 +97,7 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
+					<compilerArgument> -proc:none</compilerArgument>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -109,6 +110,26 @@
 						<goals>
 							<goal>jar-no-fork</goal>
 						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>2.0.2</version>
+				<executions>
+					<execution>
+						<id>process-test</id>
+						<goals>
+							<goal>process-test</goal>
+						</goals>
+						<phase>generate-test-sources</phase>
+						<configuration>
+							<outputDirectory>target/generated-test-sources/test-annotations</outputDirectory>
+							<processors>
+								<processor>easycriteria.modelgen.JPACriteriaProcessor</processor>
+							</processors>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

@@ -6,26 +6,26 @@ import javax.persistence.criteria.Predicate;
 
 import easycriteria.meta.EntityPathNode;
 
-public class GreaterThanCondition<A> extends WhereCondition {
+public class IsNullCondition extends WhereCondition {
 
-	private final A value;
 
-	public GreaterThanCondition(String attribute, A value, EntityPathNode parentAttribute) {
+	public IsNullCondition(String attribute) {
 		this.attribute = attribute;
-		this.value = value;
+	}
+	
+	public IsNullCondition(String attribute, EntityPathNode parentAttribute) {
+		this.attribute = attribute;
 		this.parentAttribute = parentAttribute;
 	}
 
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
-
-		return builder.greaterThan(path.get(attribute), (Comparable) value);
+		return builder.isNull(path.get(attribute));
 	}
 
 	@Override
 	public String toString() {
 
-		return parentPath.toString() + "." + attribute + " > " + value;
+		return parentAttribute.toString() + "." + attribute + " is null ";
 	}
 }

@@ -9,115 +9,81 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.CollectionAttribute;
-import javax.persistence.metamodel.ListAttribute;
-import javax.persistence.metamodel.MapAttribute;
-import javax.persistence.metamodel.SetAttribute;
-import javax.persistence.metamodel.SingularAttribute;
 
-import easycriteria.where.CompoundAndCondition;
-import easycriteria.where.CompoundOrCondition;
+import easycriteria.meta.ObjectAttribute;
 import easycriteria.where.WhereCondition;
 
 public class JoinBuilder<E, A, S, B extends WhereConditionsContainer>
-		implements WhereCondition, WhereConditionsContainer {
+		extends WhereCondition implements WhereConditionsContainer {
 
 	private final List<WhereCondition> whereClauses;
 	private final B queryBuilder;
 	private final WhereTransformer whereTransformer;
-	private final JoinType joinType;
 	private Path<E> parentPath;
 	private Join<E, A> join;
+	private ObjectAttribute<A> alias; //TODO Alias is not used currently
 
-	public JoinBuilder(SingularAttribute<E, A> attribute, B queryBuilder, WhereTransformer whereTransformer,
+	public JoinBuilder(String attribute, B queryBuilder, WhereTransformer whereTransformer,
 			JoinType joinType, Path<E> parentPath) {
 		this.whereClauses = new ArrayList<>();
 		this.queryBuilder = queryBuilder;
 		this.whereTransformer = whereTransformer;
-		this.joinType = joinType;
-		this.parentPath = parentPath;
-
-		performJoin(attribute, this.joinType);
-	}
-
-	public JoinBuilder(ListAttribute<E, A> attribute, B queryBuilder, WhereTransformer whereTransformer,
-			JoinType joinType, Path<E> parentPath) {
-		this.whereClauses = new ArrayList<>();
-		this.queryBuilder = queryBuilder;
-		this.whereTransformer = whereTransformer;
-		this.joinType = joinType;
-		this.parentPath = parentPath;
-
-		performJoin(attribute, this.joinType);
-	}
-
-	public JoinBuilder(SetAttribute<E, A> attribute, B queryBuilder, WhereTransformer whereTransformer,
-			JoinType joinType, Path<E> parentPath) {
-		this.whereClauses = new ArrayList<>();
-		this.queryBuilder = queryBuilder;
-		this.whereTransformer = whereTransformer;
-		this.joinType = joinType;
 		this.parentPath = parentPath;
 
 		performJoin(attribute, joinType);
 	}
-
-	public JoinBuilder(CollectionAttribute<E, A> attribute, B queryBuilder, WhereTransformer whereTransformer,
-			JoinType joinType, Path<E> parentPath) {
+	
+	public JoinBuilder(String attribute, B queryBuilder, WhereTransformer whereTransformer,
+			JoinType joinType, Path<E> parentPath, ObjectAttribute<A> alias) {
 		this.whereClauses = new ArrayList<>();
 		this.queryBuilder = queryBuilder;
 		this.whereTransformer = whereTransformer;
-		this.joinType = joinType;
 		this.parentPath = parentPath;
+		this.alias = alias;
 
 		performJoin(attribute, joinType);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void performJoin(Attribute attribute, JoinType joinType) {
-		if (attribute instanceof SingularAttribute) {
-			this.join = ((From) parentPath).join((SingularAttribute<E, A>) attribute, joinType);
-		} else if (attribute instanceof ListAttribute) {
-			this.join = ((From) parentPath).join((ListAttribute<E, A>) attribute, joinType);
-		} else if (attribute instanceof SetAttribute) {
-			this.join = ((From) parentPath).join((SetAttribute<E, A>) attribute, joinType);
-		} else if (attribute instanceof CollectionAttribute) {
-			this.join = ((From) parentPath).join((CollectionAttribute<E, A>) attribute, joinType);
-		} else if (attribute instanceof MapAttribute) {
-			this.join = ((From) parentPath).join((MapAttribute) attribute, joinType);
-		}
+	private void performJoin(String attribute, JoinType joinType) {
+		this.join = ((From) parentPath).join(attribute, joinType);
+	}
+	
+	public JoinBuilder<E, A, S, B> on(WhereCondition whereCondition) {
+		whereCondition.setParentPath(join);
+		addWhereCondition(whereCondition);
+		return this;
 	}
 
-	public <A1> WhereConditionBuilder<A, A1, S, JoinBuilder<E, A, S, B>> where(SingularAttribute<A, A1> attribute) {
-		return new WhereConditionBuilder<A, A1, S, JoinBuilder<E, A, S, B>>(this, attribute, join);
+//	public <A1> JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>> join(String attribute, JoinType joinType) {
+//		return new JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>>(attribute, this, whereTransformer, joinType, join);
+//	}
+	
+	public <A1> JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>> join(ObjectAttribute<A1> attribute, JoinType joinType) {
+		return new JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>>(attribute.getAttribute(), this, whereTransformer, joinType, join);
+	}
+	
+	public <A1> JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>> join(ObjectAttribute<A1> attribute, JoinType joinType, ObjectAttribute<A1> alias) {
+		return new JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>>(attribute.getAttribute(), this, whereTransformer, joinType, join, alias);
 	}
 
-	public CompoundAndCondition<A, S, JoinBuilder<E, A, S, B>> whereAnd() {
-		return new CompoundAndCondition<A, S, JoinBuilder<E, A, S, B>>(this, whereTransformer, join);
-	}
-
-	public CompoundOrCondition<A, S, JoinBuilder<E, A, S, B>> whereOr() {
-		return new CompoundOrCondition<A, S, JoinBuilder<E, A, S, B>>(this, whereTransformer, join);
-	}
-
-	public <A1> JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>> join(SingularAttribute<A, A1> attribute,
-			JoinType joinType) {
-		return new JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>>(attribute, this, whereTransformer, joinType, join);
-	}
+//	public <A1> JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>> join(String attribute, JoinType joinType, EntityPathNode joinAlias) {
+//		return new JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>>(attribute, this, whereTransformer, joinType, join);
+//	}
 
 	public B endJoin() {
-		queryBuilder.addWhereClause(this);
+		queryBuilder.addWhereCondition(this);
 		return queryBuilder;
 	}
 
-	public void addWhereClause(WhereCondition whereClause) {
+	public void addWhereCondition(WhereCondition whereClause) {
 		whereClauses.add(whereClause);
 	}
-
+	
 	@Override
-	public Predicate buildPredicate(CriteriaBuilder cb) {
-		Predicate[] constraints = whereTransformer.transform(whereClauses);
+	@SuppressWarnings("rawtypes")
+	protected Predicate buildJPAPredicate(CriteriaBuilder cb, Path path) {
+		Predicate[] constraints = whereTransformer.transform(whereClauses, path);
 		return cb.and(constraints);
 	}
 }

@@ -3,33 +3,42 @@ package easycriteria.where;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.SingularAttribute;
 
-public class LikeCondition<E> implements WhereCondition {
+import easycriteria.meta.EntityPathNode;
 
-	private final SingularAttribute<E, String> attribute;
+public class LikeCondition<E> extends WhereCondition {
+
 	private final String likeString;
-	private Path<E> parentPath;
 
-	public LikeCondition(SingularAttribute<E, String> attribute, String likeString) {
+	public LikeCondition(String attribute, String likeString) {
 		this.attribute = attribute;
 		this.likeString = likeString;
 	}
 
-	public LikeCondition(SingularAttribute<E, String> attribute, String likeString, Path<E> parentPath) {
+	public LikeCondition(String attribute, String likeString, Path parentPath) {
 		this.attribute = attribute;
 		this.likeString = likeString;
 		this.parentPath = parentPath;
 	}
 
-	@Override
-	public Predicate buildPredicate(CriteriaBuilder builder) {
-		return builder.like(parentPath.get(attribute), likeString);
+	public <T> LikeCondition(String attribute, String likeString, Path parentPath,
+			EntityPathNode parentAttribute) {
+		super();
+		this.attribute = attribute;
+		this.likeString = likeString;
+		this.parentPath = parentPath;
+		this.parentAttribute = parentAttribute;
 	}
 
 	@Override
 	public String toString() {
 
-		return parentPath.toString() + "." + attribute.getName() + " like " + likeString;
+		return parentPath.toString() + "." + attribute + " like " + likeString;
+	}
+
+	@Override
+	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
+		
+		return builder.like(path.get(attribute), likeString);
 	}
 }

@@ -1,30 +1,32 @@
 package easycriteria.where;
 
+import java.util.Collection;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 
 import easycriteria.meta.EntityPathNode;
 
-public class LessThanEqualsCondition<A> extends WhereCondition {
+public class NotInCondition<A> extends WhereCondition {
 
-	private final A value;
+	private final Collection<A> args;
 
-	public LessThanEqualsCondition(String attribute, A value, EntityPathNode parentAttribute) {
+	public NotInCondition(String attribute, Collection<A> args, EntityPathNode parentAttribute) {
 		this.attribute = attribute;
-		this.value = value;
+		this.args = args;
 		this.parentAttribute = parentAttribute;
 	}
-	
+
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
-		return builder.lessThanOrEqualTo(path.get(attribute), (Comparable) value);
+
+		return builder.not(path.get(attribute).in(args));
 	}
 
 	@Override
 	public String toString() {
 
-		return parentPath.toString() + "." + attribute + " <= " + value;
+		return parentPath.toString() + "." + attribute + " in " + args;
 	}
 }

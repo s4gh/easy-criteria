@@ -6,11 +6,8 @@ import java.util.List;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.ListAttribute;
-import javax.persistence.metamodel.SingularAttribute;
 
-import easycriteria.where.CompoundAndCondition;
-import easycriteria.where.CompoundOrCondition;
+import easycriteria.meta.ObjectAttribute;
 import easycriteria.where.WhereCondition;
 
 public class EasyCriteriaQuery<E, S> implements WhereConditionsContainer {
@@ -35,38 +32,34 @@ public class EasyCriteriaQuery<E, S> implements WhereConditionsContainer {
 		this.orderByTransformer = orderByTransformer;
 		this.root = root;
 	}
-
-	public CompoundOrCondition<E, S, EasyCriteriaQuery<E, S>> whereOr() {
-
-		return new CompoundOrCondition<E, S, EasyCriteriaQuery<E, S>>(this, whereTransformer, root);
+	
+	public EasyCriteriaQuery<E, S> where(WhereCondition whereCondition){
+		addWhereCondition(whereCondition);
+		return this;
 	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public EasyCriteriaQuery<E, S> orderBy(OrderBy... orderBys) {
 
-	public CompoundAndCondition<E, S, EasyCriteriaQuery<E, S>> whereAnd() {
-
-		return new CompoundAndCondition<E, S, EasyCriteriaQuery<E, S>>(this, whereTransformer, root);
+		for (int i = 0; i < orderBys.length; i++) {
+			this.addOrderBy(orderBys[i]);
+		}
+		return this;
 	}
-
-	public <A> WhereConditionBuilder<E, A, S, EasyCriteriaQuery<E, S>> where(SingularAttribute<E, A> attribute) {
-		return new WhereConditionBuilder<E, A, S, EasyCriteriaQuery<E, S>>(this, attribute, root);
-	}
-
-	public <A> OrderByBuilder<E, A, S> orderBy(SingularAttribute<E, A> attribute) {
-
-		return new OrderByBuilder<E, A, S>(this, attribute);
-	}
-
-	public <A> JoinBuilder<E, A, S, EasyCriteriaQuery<E, S>> join(SingularAttribute<E, A> attribute,
+	
+	public <A> JoinBuilder<E, A, S, EasyCriteriaQuery<E, S>> join(ObjectAttribute<A> attribute,
 			JoinType joinType) {
 
-		return new JoinBuilder<E, A, S, EasyCriteriaQuery<E, S>>(attribute, this, whereTransformer, joinType, root);
+		return new JoinBuilder<E, A, S, EasyCriteriaQuery<E, S>>(attribute.getAttribute(), this, whereTransformer, joinType, root);
+	}
+	
+	public <A> JoinBuilder<E, A, S, EasyCriteriaQuery<E, S>> join(ObjectAttribute<A> attribute,
+			JoinType joinType, ObjectAttribute<A> alias) {
+
+		return new JoinBuilder<E, A, S, EasyCriteriaQuery<E, S>>(attribute.getAttribute(), this, whereTransformer, joinType, root);
 	}
 
-	public <A> JoinBuilder<E, A, S, EasyCriteriaQuery<E, S>> join(ListAttribute<E, A> attribute, JoinType joinType) {
-
-		return new JoinBuilder<E, A, S, EasyCriteriaQuery<E, S>>(attribute, this, whereTransformer, joinType, root);
-	}
-
-	public void addWhereClause(WhereCondition whereClause) {
+	public void addWhereCondition(WhereCondition whereClause) {
 
 		whereClauses.add(whereClause);
 	}
@@ -96,7 +89,7 @@ public class EasyCriteriaQuery<E, S> implements WhereConditionsContainer {
 	}
 
 	protected CriteriaQuery<S> getCriteriaQuery() {
-		return criteriaQuery.where(whereTransformer.transform(getWhereClauses()))
+		return criteriaQuery.where(whereTransformer.transform(getWhereClauses(), getRoot()))
 				.orderBy(orderByTransformer.transform(getOrderClauses()));
 	}
 

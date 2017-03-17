@@ -4,24 +4,26 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 
-public class NotEqualsCondition<A> extends WhereCondition {
+import easycriteria.meta.EntityPathNode;
 
-	private final A value;
+public class EqualsIgnoreCaseCondition extends WhereCondition {
 
-	public NotEqualsCondition(String attribute, A object) {
+	private final String value;
+
+	public <T> EqualsIgnoreCaseCondition(String attribute, String object) {
 		this.attribute = attribute;
 		this.value = object;
 	}
 
-	public NotEqualsCondition(String attribute, A object, Path parentPath) {
+	public <T> EqualsIgnoreCaseCondition(String attribute, String object, EntityPathNode parentAttribute) {
 		this.attribute = attribute;
 		this.value = object;
-		this.parentPath = parentPath;
+		this.parentAttribute = parentAttribute;
 	}
 
 	@Override
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
-		return builder.notEqual(path.get(attribute), value);
+		return builder.equal(builder.upper(path.get(attribute)), value.toUpperCase());
 	}
 
 	@Override

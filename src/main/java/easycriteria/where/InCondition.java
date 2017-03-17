@@ -5,29 +5,28 @@ import java.util.Collection;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.SingularAttribute;
 
-public class InCondition<E, A> implements WhereCondition {
+import easycriteria.meta.EntityPathNode;
 
-	private final SingularAttribute<E, A> attribute;
+public class InCondition<A> extends WhereCondition {
+
 	private final Collection<A> args;
-	private Path<E> parentPath;
 
-	public InCondition(SingularAttribute<E, A> attribute, Collection<A> args, Path<E> parentPath) {
+	public InCondition(String attribute, Collection<A> args, EntityPathNode parentAttribute) {
 		this.attribute = attribute;
 		this.args = args;
-		this.parentPath = parentPath;
+		this.parentAttribute = parentAttribute;
 	}
 
 	@Override
-	public Predicate buildPredicate(CriteriaBuilder builder) {
+	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
 
-		return parentPath.get(attribute).in(args);
+		return path.get(attribute).in(args);
 	}
 
 	@Override
 	public String toString() {
 
-		return parentPath.toString() + "." + attribute.getName() + " in " + args;
+		return parentPath.toString() + "." + attribute + " in " + args;
 	}
 }
