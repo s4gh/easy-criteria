@@ -18,6 +18,7 @@ public class IsNotNullCondition extends WhereCondition {
 		this.parentAttribute = parentAttribute;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
 		return builder.isNotNull(path.get(attribute));

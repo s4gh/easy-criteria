@@ -13,12 +13,14 @@ public class NotEqualsCondition<A> extends WhereCondition {
 		this.value = object;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public NotEqualsCondition(String attribute, A object, Path parentPath) {
 		this.attribute = attribute;
 		this.value = object;
 		this.parentPath = parentPath;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
 		return builder.notEqual(path.get(attribute), value);

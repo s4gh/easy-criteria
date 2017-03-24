@@ -15,6 +15,7 @@ public class OrCondition extends WhereCondition {
 		this.right = right;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path parentPath) {
 		return builder.or(left.buildPredicate(builder, parentPath), right.buildPredicate(builder, parentPath));

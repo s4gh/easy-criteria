@@ -2,8 +2,6 @@ package easycriteria;
 
 import static org.junit.Assert.assertEquals;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -34,40 +32,23 @@ public class EasyCriteriaQueryTestInheritance {
 		
 		QDog_ dog = new QDog_();
 		
-//		List<Dog> dogs = query.select(Dog.class).where(dog.name.eq("dog2")).getResultList();		
-//		assertEquals(2, dogs.size());
-		
-//		List<Animal> animals = query.select(Animal.class).getResultList();
-//		System.out.println("============================");
-//		System.out.println(animals.size() + " | " + animals);
-//		System.out.println("============================");
-		
 		List<Dog> dogs1 = query.select(Dog.class).where(dog.petAddress.zip.eq("zip1")).getResultList();
-		System.out.println("============================");
-		System.out.println(dogs1);
-		System.out.println("============================");
 		assertEquals(1, dogs1.size());
 		
-		QAnimal_ animal = new QAnimal_();
 		QLargeProject_ largeProject = new QLargeProject_();
 		QHomeAnimal_ homeAnimal = new QHomeAnimal_();
 		
-//		List<LargeProject> projects = query.select(LargeProject.class)
-//				.where(largeProject.type.eq(ProjectType.DEVELOPMENT))
-//				.getResultList();
-//		System.out.println("============================");
-//		System.out.println(projects.size() + " | " + projects);
-//		System.out.println("============================");
+		List<LargeProject> projects = query.select(LargeProject.class)
+				.where(largeProject.type.eq(ProjectType.DEVELOPMENT))
+				.getResultList();
+		assertEquals(1, projects.size());
 		
 		List<LargeProject> projects1 = query.select(LargeProject.class)
 				.join(largeProject.homeAnimal, JoinType.INNER, homeAnimal)
 					.on(homeAnimal.owner.eq("owner1"))
 				.endJoin()
 				.getResultList();
-		System.out.println("============================");
-		System.out.println(projects1.size() + " | " + projects1);
-		System.out.println("============================");
-		
+		assertEquals(1, projects1.size());	
 	}
 	
 	

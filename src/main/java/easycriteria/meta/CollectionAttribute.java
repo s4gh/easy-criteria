@@ -1,10 +1,16 @@
 package easycriteria.meta;
 
-import easycriteria.OrderBy;
-import easycriteria.where.EqualsCondition;
-import easycriteria.where.IsNotNullCondition;
-import easycriteria.where.IsNullCondition;
-import easycriteria.where.NotEqualsCondition;
+import java.util.Collection;
+
+import easycriteria.where.CollectionEmptyCondition;
+import easycriteria.where.InCondition;
+import easycriteria.where.CollectionMemberOfCondition;
+import easycriteria.where.CollectionSizeBetweenCondition;
+import easycriteria.where.CollectionSizeEqualsCondition;
+import easycriteria.where.CollectionSizeGreaterCondition;
+import easycriteria.where.CollectionSizeGreaterOrEqCondition;
+import easycriteria.where.CollectionSizeLessThanCondition;
+import easycriteria.where.CollectionSizeLessThanOrEqCondition;
 import easycriteria.where.WhereCondition;
 
 /**
@@ -12,57 +18,57 @@ import easycriteria.where.WhereCondition;
  * @param <X> The type containing the represented attribute
  * @param <T> The type of the represented attribute
  */
-public class CollectionAttribute<X, T> implements EntityPathNode {
-	
-	private String attribute;	
-	private EntityPathNode parentPath;
-	
-	public CollectionAttribute(String attribute) {
-		this.attribute = attribute;				
-	}
+public class CollectionAttribute<X, T> extends ObjectAttribute<T> {
 	
 	public CollectionAttribute(String attribute, EntityPathNode parentPath) {
-		this.attribute = attribute;
-		if (parentPath != null && parentPath.getParent() != null) {
-			this.parentPath = parentPath;
-		}
-	}
-	
-	public WhereCondition isNull() {
-		return new IsNullCondition(attribute, parentPath);
-	}
-	
-	public WhereCondition isNotNull() {
-		return new IsNotNullCondition(attribute, parentPath);
+		super(attribute, parentPath);
 	}
 
-	public WhereCondition eq(T value) {
-		return new EqualsCondition<T>(attribute, value, parentPath);
+	public WhereCondition in(Collection<T> args) {
+		return new InCondition<T>(getAttribute(), args, getParent());
 	}
 	
-	public WhereCondition notEq(T value) {
-		return new NotEqualsCondition<T>(attribute, value);
-	}
-
-	public OrderBy<X, T> desc() {
-		return new OrderBy<X, T>(attribute, false);
+	public WhereCondition notIn(Collection<T> args) {
+		return new InCondition<T>(getAttribute(), args, getParent(), false);
 	}
 	
-	public OrderBy<X, T> asc() {
-		return new OrderBy<X, T>(attribute, true);
+	public WhereCondition contains(T element) {
+		return new CollectionMemberOfCondition<T>(getAttribute(), element, getParent(), true);
 	}
 	
-	public String getAttribute() {
-		return attribute;
+	public WhereCondition notContains(T element) {
+		return new CollectionMemberOfCondition<T>(getAttribute(), element, getParent(), false);
 	}
-
-	@Override
-	public EntityPathNode getParent() {
-		return parentPath;
+	
+	public WhereCondition isEmpty() {
+		return new CollectionEmptyCondition(getAttribute(), getParent(), true);
 	}
-
-	@Override
-	public void setParent(EntityPathNode parent) {
-		this.parentPath = parent;
+	
+	public WhereCondition isNotEmpty() {
+		return new CollectionEmptyCondition(getAttribute(), getParent(), false);
+	}
+	
+	public WhereCondition sizeEq(int size) {
+		return new CollectionSizeEqualsCondition(getAttribute(), size, getParent());
+	}
+	
+	public WhereCondition sizeGreaterThan(int size) {
+		return new CollectionSizeGreaterCondition(getAttribute(), size, getParent());
+	}
+	
+	public WhereCondition sizeGreaterThanOrEqualTo(int size) {
+		return new CollectionSizeGreaterOrEqCondition(getAttribute(), size, getParent());
+	}
+	
+	public WhereCondition sizeLessThan(int size) {
+		return new CollectionSizeLessThanCondition(getAttribute(), size, getParent());
+	}
+	
+	public WhereCondition sizeLessThanOrEqualTo(int size) {
+		return new CollectionSizeLessThanOrEqCondition(getAttribute(), size, getParent());
+	}
+	
+	public WhereCondition sizeBetween(int start, int end) {
+		return new CollectionSizeBetweenCondition(getAttribute(), start, end, getParent());
 	}
 }

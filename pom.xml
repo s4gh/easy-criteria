@@ -127,7 +127,7 @@
 						<configuration>
 							<outputDirectory>target/generated-test-sources/test-annotations</outputDirectory>
 							<processors>
-								<processor>easycriteria.modelgen.JPACriteriaProcessor</processor>
+								<processor>easycriteria.meta.modelgen.JPACriteriaProcessor</processor>
 							</processors>
 						</configuration>
 					</execution>

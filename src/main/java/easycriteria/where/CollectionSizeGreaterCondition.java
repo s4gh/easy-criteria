@@ -1,32 +1,31 @@
 package easycriteria.where;
 
-import java.util.Collection;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 
 import easycriteria.meta.EntityPathNode;
 
-public class NotInCondition<A> extends WhereCondition {
+public class CollectionSizeGreaterCondition extends WhereCondition {
 
-	private final Collection<A> args;
+	private final int value;
 
-	public NotInCondition(String attribute, Collection<A> args, EntityPathNode parentAttribute) {
+	public CollectionSizeGreaterCondition(String attribute, int value, EntityPathNode parentAttribute) {
 		this.attribute = attribute;
-		this.args = args;
+		this.value = value;
 		this.parentAttribute = parentAttribute;
 	}
 
 	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
-
-		return builder.not(path.get(attribute).in(args));
+		
+		return builder.greaterThan(builder.size(path.get(attribute)), value);
 	}
 
 	@Override
 	public String toString() {
 
-		return parentPath.toString() + "." + attribute + " in " + args;
+		return parentPath.toString() + "." + attribute + " size > " + value;
 	}
 }

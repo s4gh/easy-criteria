@@ -11,6 +11,7 @@ import easycriteria.meta.EntityPathNode;
 public abstract class WhereCondition {
 	
 	protected String attribute;
+	@SuppressWarnings("rawtypes")
 	protected Path parentPath;
 	protected EntityPathNode parentAttribute;
 	
@@ -22,8 +23,9 @@ public abstract class WhereCondition {
 		return new OrCondition(this, otherCondition);
 	}
 
-	protected abstract Predicate buildJPAPredicate(CriteriaBuilder builder, Path root);
+	protected abstract Predicate buildJPAPredicate(CriteriaBuilder builder, @SuppressWarnings("rawtypes") Path root);
 	
+	@SuppressWarnings("rawtypes")
 	public Predicate buildPredicate(CriteriaBuilder builder, Path root){
 		if (parentPath == null) {
 			parentPath = root;
@@ -36,6 +38,7 @@ public abstract class WhereCondition {
 		return buildJPAPredicate(builder , parentPath);
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private Path buildParentPath(Path parentPath, EntityPathNode parentAttribute) {
 				
 		LinkedList<EntityPathNode> hierarchy = new LinkedList<>();
@@ -67,10 +70,12 @@ public abstract class WhereCondition {
 		this.attribute = attribute;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Path getParentPath() {
 		return parentPath;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void setParentPath(Path parentPath) {
 		this.parentPath = parentPath;
 	}

@@ -15,6 +15,7 @@ public class AndCondition extends WhereCondition {
 		this.right = right;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path parentPath) {
 		return builder.and(left.buildPredicate(builder, parentPath), right.buildPredicate(builder, parentPath));

@@ -1,4 +1,4 @@
-package easycriteria.modelgen;
+package easycriteria.meta.modelgen;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -83,14 +83,15 @@ public class AnnotationProcessorUtils {
 	}
 
 	public static enum TypeCategory {
-		COLLECTION("CollectionAttribute"), 
-		SET("SetAttribute"), 
-		LIST("ListAttribute"), 
-		MAP("MapAttribute"), 
+		
+		COLLECTION("CollectionAttribute"),
+		SET("CollectionAttribute"),
+		LIST("CollectionAttribute"),
+		MAP("MapAttribute"),
 		ATTRIBUTE("PropertyAttribute"), 
 		STRING_ATTRIBUTE("StringPropertyAttribute"), 
-		OBJECT_ATTRIBUTE("ObjectAttribute"), 
-		JPA_ENTITY_ATTRIBUTE("ObjectAttribute"),
+		OBJECT_ATTRIBUTE("ObjectAttribute"),
+		JPA_ENTITY_ATTRIBUTE("ObjectAttribute"), 
 		NUMBER_ATTRIBUTE("NumberPropertyAttribute"), 
 		DATE_ATTRIBUTE("DatePropertyAttribute");
 
@@ -134,29 +135,28 @@ public class AnnotationProcessorUtils {
 
 	public static boolean isFieldJPAAEntity(Element el) {
 
-		if ((el.getAnnotation(OneToOne.class) != null) 
-				|| (el.getAnnotation(JoinColumn.class) != null)
-	            || (el.getAnnotation(Embedded.class) != null)) {
-	            return true;
-	        }
-	        return false;
+		if ((el.getAnnotation(OneToOne.class) != null) || (el.getAnnotation(JoinColumn.class) != null)
+				|| (el.getAnnotation(Embedded.class) != null)) {
+			return true;
+		}
+		return false;
 	}
-	
-    /**
-     * Convenience method to return if this class element has any of the defining JPA annotations.
-     * @param el The class element
-     * @return Whether it is to be considered a JPA annotated class
-     */
-    public static boolean isJPAAnnotated(Element el)
-    {
-        if ((el.getAnnotation(Entity.class) != null) ||
-            (el.getAnnotation(MappedSuperclass.class) != null) ||
-            (el.getAnnotation(Embeddable.class) != null))
-        {
-            return true;
-        }
-        return false;
-    }
+
+	/**
+	 * Convenience method to return if this class element has any of the
+	 * defining JPA annotations.
+	 * 
+	 * @param el
+	 *            The class element
+	 * @return Whether it is to be considered a JPA annotated class
+	 */
+	public static boolean isJPAAnnotated(Element el) {
+		if ((el.getAnnotation(Entity.class) != null) || (el.getAnnotation(MappedSuperclass.class) != null)
+				|| (el.getAnnotation(Embeddable.class) != null)) {
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Convenience accessor for all field members of the supplied type element.
@@ -389,39 +389,37 @@ public class AnnotationProcessorUtils {
 		}
 		return processingEnv.getTypeUtils().asElement(type).toString();
 	}
-	
+
 	/**
-     * Convenience accessor for members for the default access type of the supplied type element.
-     * If properties are annotated then returns all properties, otherwise returns all fields. 
-     * @param el The type element
-     * @return The members
-     */
-    public static List<? extends Element> getDefaultAccessMembers(TypeElement el)
-    {
-        Iterator<? extends Element> memberIter = el.getEnclosedElements().iterator();
-        while (memberIter.hasNext())
-        {
-            Element member = memberIter.next();
-            
-            if (AnnotationProcessorUtils.isMethod(member))
-            {
-                ExecutableElement method = (ExecutableElement)member;
-                if (AnnotationProcessorUtils.isJavaBeanGetter(method) || AnnotationProcessorUtils.isJavaBeanSetter(method))
-                {
-                    // Property
-                    Iterator<? extends AnnotationMirror> annIter = member.getAnnotationMirrors().iterator();
-                    while (annIter.hasNext())
-                    {
-                        AnnotationMirror ann = annIter.next();
-                        String annTypeName = ann.getAnnotationType().toString();
-                        if (annTypeName.startsWith("javax.persistence"))
-                        {
-                            return AnnotationProcessorUtils.getPropertyMembers(el);
-                        }
-                    }
-                }
-            }
-        }
-        return AnnotationProcessorUtils.getFieldMembers(el);
-    }  
+	 * Convenience accessor for members for the default access type of the
+	 * supplied type element. If properties are annotated then returns all
+	 * properties, otherwise returns all fields.
+	 * 
+	 * @param el
+	 *            The type element
+	 * @return The members
+	 */
+	public static List<? extends Element> getDefaultAccessMembers(TypeElement el) {
+		Iterator<? extends Element> memberIter = el.getEnclosedElements().iterator();
+		while (memberIter.hasNext()) {
+			Element member = memberIter.next();
+
+			if (AnnotationProcessorUtils.isMethod(member)) {
+				ExecutableElement method = (ExecutableElement) member;
+				if (AnnotationProcessorUtils.isJavaBeanGetter(method)
+						|| AnnotationProcessorUtils.isJavaBeanSetter(method)) {
+					// Property
+					Iterator<? extends AnnotationMirror> annIter = member.getAnnotationMirrors().iterator();
+					while (annIter.hasNext()) {
+						AnnotationMirror ann = annIter.next();
+						String annTypeName = ann.getAnnotationType().toString();
+						if (annTypeName.startsWith("javax.persistence")) {
+							return AnnotationProcessorUtils.getPropertyMembers(el);
+						}
+					}
+				}
+			}
+		}
+		return AnnotationProcessorUtils.getFieldMembers(el);
+	}
 }

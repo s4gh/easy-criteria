@@ -22,6 +22,7 @@ public class EqualsIgnoreCaseCondition extends WhereCondition {
 	}
 
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
 		return builder.equal(builder.upper(path.get(attribute)), value.toUpperCase());
 	}

@@ -6,27 +6,26 @@ import javax.persistence.criteria.Predicate;
 
 import easycriteria.meta.EntityPathNode;
 
-public class IsNullCondition extends WhereCondition {
+public class CollectionSizeLessThanCondition extends WhereCondition {
 
+	private final int value;
 
-	public IsNullCondition(String attribute) {
+	public CollectionSizeLessThanCondition(String attribute, int value, EntityPathNode parentAttribute) {
 		this.attribute = attribute;
-	}
-	
-	public IsNullCondition(String attribute, EntityPathNode parentAttribute) {
-		this.attribute = attribute;
+		this.value = value;
 		this.parentAttribute = parentAttribute;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
-		return builder.isNull(path.get(attribute));
+		
+		return builder.lessThan(builder.size(path.get(attribute)), value);
 	}
 
 	@Override
 	public String toString() {
 
-		return parentAttribute.toString() + "." + attribute + " is null ";
+		return parentPath.toString() + "." + attribute + " size < " + value;
 	}
 }

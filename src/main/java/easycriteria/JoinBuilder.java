@@ -54,10 +54,6 @@ public class JoinBuilder<E, A, S, B extends WhereConditionsContainer>
 		addWhereCondition(whereCondition);
 		return this;
 	}
-
-//	public <A1> JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>> join(String attribute, JoinType joinType) {
-//		return new JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>>(attribute, this, whereTransformer, joinType, join);
-//	}
 	
 	public <A1> JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>> join(ObjectAttribute<A1> attribute, JoinType joinType) {
 		return new JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>>(attribute.getAttribute(), this, whereTransformer, joinType, join);
@@ -66,10 +62,6 @@ public class JoinBuilder<E, A, S, B extends WhereConditionsContainer>
 	public <A1> JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>> join(ObjectAttribute<A1> attribute, JoinType joinType, ObjectAttribute<A1> alias) {
 		return new JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>>(attribute.getAttribute(), this, whereTransformer, joinType, join, alias);
 	}
-
-//	public <A1> JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>> join(String attribute, JoinType joinType, EntityPathNode joinAlias) {
-//		return new JoinBuilder<A, A1, S, JoinBuilder<E, A, S, B>>(attribute, this, whereTransformer, joinType, join);
-//	}
 
 	public B endJoin() {
 		queryBuilder.addWhereCondition(this);

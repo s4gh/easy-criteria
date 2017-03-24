@@ -14,12 +14,6 @@ public class EqualsCondition<A> extends WhereCondition {
 		this.attribute = attribute;
 		this.value = object;
 	}
-//
-//	public EqualsCondition(String attribute, A object, Path parentPath) {
-//		this.attribute = attribute;
-//		this.value = object;
-//		this.parentPath = parentPath;
-//	}
 	
 	public EqualsCondition(String attribute, A object, EntityPathNode parentAttribute) {
 		this.attribute = attribute;
@@ -27,6 +21,7 @@ public class EqualsCondition<A> extends WhereCondition {
 		this.parentAttribute = parentAttribute;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
 		return builder.equal(path.get(attribute), value);
