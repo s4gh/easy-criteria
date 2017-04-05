@@ -6,12 +6,12 @@ import easycriteria.where.WhereCondition;
 
 public class StringPropertyAttribute<X, T> extends PropertyAttribute<X, T>{
 
-	public StringPropertyAttribute(String attribute) {
-		super(attribute);
+	public StringPropertyAttribute(String attribute, Class<T> entityType) {
+		super(attribute, entityType);
 	}
 
-	public StringPropertyAttribute(String attribute, EntityPathNode parentPath) {
-		super(attribute, parentPath);
+	public StringPropertyAttribute(String attribute, EntityPathNode parentPath, Class<T> entityType) {
+		super(attribute, parentPath, entityType);
 	}
 	
 	public WhereCondition eqIgnoreCase(String value) {

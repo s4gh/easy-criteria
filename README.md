@@ -81,6 +81,9 @@ List<LargeProject> projects = query.select(LargeProject.class)
 ```
 In this example when we perform join ```join(largeProject.homeAnimal, JoinType.INNER, homeAnimal)``` we specify join type ```JoinType.INNER``` and join table alias ```homeAnimal``` which is later used to filter results.
 
+## Limitations
+Currently map joins are not supported. Use JPA API directly to construct queries which require map joins.
+
 # See Also
 If you are looking for typesafe ways to execute SQL queries in Java please also check
 * [Querydsl](http://www.querydsl.com)

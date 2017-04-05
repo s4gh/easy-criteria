@@ -11,7 +11,7 @@ import easycriteria.meta.EntityPathNode;
 public class InCondition<A> extends WhereCondition {
 
 	private final Collection<A> args;
-	private boolean positiveCondition = false;
+	private boolean positiveCondition = true;
 
 	public InCondition(String attribute, Collection<A> args, EntityPathNode parentAttribute) {
 		this.attribute = attribute;

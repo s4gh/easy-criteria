@@ -19,17 +19,20 @@ public class PropertyAttribute<X, T> implements EntityPathNode {
 	
 	private String attribute;	
 	private EntityPathNode parentPath;
+	private Class<T> propertyType;
 	
-	public PropertyAttribute(String attribute) {
-		this.attribute = attribute;				
+	public PropertyAttribute(String attribute, Class<T> propertyType) {
+		this.attribute = attribute;
+		this.propertyType = propertyType;		
 	}
 	
-	public PropertyAttribute(String attribute, EntityPathNode parentPath) {
+	public PropertyAttribute(String attribute, EntityPathNode parentPath, Class<T> propertyType) {
 		this.attribute = attribute;
-		if (parentPath != null && parentPath.getParent() != null) {
-			this.parentPath = parentPath;
-		}
-	}		
+
+		this.parentPath = parentPath;
+				
+		this.propertyType = propertyType;		
+	}
 
 	public WhereCondition eq(T value) {
 		return new EqualsCondition<T>(attribute, value, parentPath);
@@ -72,4 +75,14 @@ public class PropertyAttribute<X, T> implements EntityPathNode {
 	public void setParent(EntityPathNode parent) {
 		this.parentPath = parent;
 	}
+
+
+	public Class<T> getPropertyType() {
+		return propertyType;
+	}
+
+	@Override
+	public Class<?> getEntityType() {
+		return parentPath.getEntityType();
+	}	
 }

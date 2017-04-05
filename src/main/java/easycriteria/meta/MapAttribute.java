@@ -9,16 +9,20 @@ import easycriteria.where.WhereCondition;
  * @param <X> The type containing the represented attribute
  * @param <T> The type of the represented attribute
  */
-public class ObjectAttribute<T> implements EntityPathNode {
+public class MapAttribute<X, K, V> implements EntityPathNode {
 	
 	private String attribute;
 	private EntityPathNode parentPath;
-	private Class<T> entityType;
+	private Class<X> entityType;
+	private Class<K> keyType;
+	private Class<V> valueType;
 	
-	public ObjectAttribute(String attribute, EntityPathNode parentPath, Class<T> entityType) {
+	public MapAttribute(String attribute, EntityPathNode parentPath, Class<X> entityType, Class<K> keyType, Class<V> valueType) {
 		this.attribute = attribute;		
 		this.parentPath = parentPath;
 		this.entityType = entityType;
+		this.keyType = keyType;
+		this.valueType = valueType;
 	}
 
 	public WhereCondition isNull() {
@@ -44,7 +48,15 @@ public class ObjectAttribute<T> implements EntityPathNode {
 	}
 
 	@Override
-	public Class<T> getEntityType() {
+	public Class<X> getEntityType() {
 		return entityType;
+	}
+
+	public Class<K> getKeyType() {
+		return keyType;
+	}
+
+	public Class<V> getValueType() {
+		return valueType;
 	}
 }

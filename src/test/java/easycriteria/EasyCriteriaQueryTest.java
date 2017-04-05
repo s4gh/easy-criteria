@@ -78,16 +78,17 @@ public class EasyCriteriaQueryTest {
 		assertEquals(2, employees.size());
 	}
 
-//	@Test
-//	public void testSelectAttribute() {
-//		createEmployee("i1");
-//		createEmployee("i2");
-//		createEmployee("i3");
-//
-//		List<String> employees = query.select(Employee_.fullName).getResultList();
-//
-//		assertTrue(Arrays.asList("i1", "i2", "i3").containsAll(employees));
-//	}
+	@Test
+	public void testSelectAttribute() {
+		createEmployee("i1");
+		createEmployee("i2");
+		createEmployee("i3");
+
+		QEmployee_ employee = new QEmployee_();
+		List<String> employees = query.select(employee.fullName).getResultList();
+
+		assertTrue(Arrays.asList("i1", "i2", "i3").containsAll(employees));
+	}
 
 	@Test
 	public void testSingle() {

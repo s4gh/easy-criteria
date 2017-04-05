@@ -31,7 +31,7 @@ public abstract class WhereCondition {
 			parentPath = root;
 		}
 
-		if (parentAttribute != null) {
+		if (parentAttribute != null && parentAttribute.getParent() != null) {
 			parentPath = buildParentPath(root, parentAttribute);
 		}
 		
@@ -53,11 +53,13 @@ public abstract class WhereCondition {
 	}
 	
 	private void reversePathHierarchy(LinkedList<EntityPathNode> hierarchy, EntityPathNode leafNode) {
-		if (leafNode.getParent() == null) {
-			return;
-		} else {
-			hierarchy.addFirst(leafNode);
-			reversePathHierarchy(hierarchy, leafNode.getParent());
+		if (leafNode != null) {
+			if (leafNode.getParent() == null) {
+				return;
+			} else {
+				hierarchy.addFirst(leafNode);
+				reversePathHierarchy(hierarchy, leafNode.getParent());
+			} 
 		}
 	}
 	

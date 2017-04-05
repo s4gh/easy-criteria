@@ -4,7 +4,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
+
+import easycriteria.meta.ObjectAttribute;
+import easycriteria.meta.PropertyAttribute;
 
 public class JPAQuery {
 
@@ -26,16 +28,21 @@ public class JPAQuery {
 
 		return createEasyQuery(criteriaQuery, entityManager, criteriaBuilder, root);
 	}
+	
+	public <S> EasyCriteriaQuery<S, S> select(ObjectAttribute<S> objectAttribute) {
+		return select(objectAttribute.getEntityType());
+	}
 
-	public <E, S> EasyCriteriaQuery<E, S> select(SingularAttribute<E, S> selectAttribute) {
+	@SuppressWarnings("unchecked")
+	public <X, T> EasyCriteriaQuery<X, T> select(PropertyAttribute<X, T> selectAttribute) {
 
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 
-		CriteriaQuery<S> criteriaQuery = criteriaBuilder.createQuery(selectAttribute.getJavaType());
+		CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(selectAttribute.getPropertyType());
 
-		Root<E> root = criteriaQuery.from(selectAttribute.getDeclaringType().getJavaType());
+		Root<X> root = (Root<X>) criteriaQuery.from(selectAttribute.getEntityType());
 
-		criteriaQuery.select(root.get(selectAttribute));
+		criteriaQuery.select(root.get(selectAttribute.getAttribute()));
 
 		return createEasyQuery(criteriaQuery, entityManager, criteriaBuilder, root);
 	}

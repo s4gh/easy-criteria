@@ -121,7 +121,7 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 				w.append(CODE_INDENT)
 						.append("public " + CLASS_NAME_PREFIX + classSimpleName + CLASS_NAME_SUFFIX + "() {");
 				w.append("\n");
-				w.append(CODE_INDENT).append(CODE_INDENT).append("super(null, null);");
+				w.append(CODE_INDENT).append(CODE_INDENT).append("super(null, null, ").append(classSimpleName).append(".class);");
 				w.append("\n");
 				w.append(CODE_INDENT).append("}");
 				w.append("\n");
@@ -129,7 +129,7 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 				w.append(CODE_INDENT).append("public " + CLASS_NAME_PREFIX + classSimpleName + CLASS_NAME_SUFFIX
 						+ "(String attribute, EntityPathNode parent) {");
 				w.append("\n");
-				w.append(CODE_INDENT).append(CODE_INDENT).append("super(attribute, parent);");
+				w.append(CODE_INDENT).append(CODE_INDENT).append("super(attribute, parent, ").append(classSimpleName).append(".class);");;
 				w.append("\n");
 				w.append(CODE_INDENT).append("}");
 				w.append("\n");
@@ -245,31 +245,32 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 
 	private void writePropertyAttribute(String classSimpleName, Map<String, TypeMirror> genericLookups, Writer w,
 			Element member, TypeMirror type, TypeCategory cat, String memberName) throws IOException {
+		
+		String typeName = type.toString();
+		
 		w.append(CODE_INDENT).append("public " + cat.getTypeName()).append("<" + classSimpleName + ", ");
 		if (cat == TypeCategory.ATTRIBUTE || cat == TypeCategory.DATE_ATTRIBUTE || cat == TypeCategory.NUMBER_ATTRIBUTE
 				|| cat == TypeCategory.STRING_ATTRIBUTE) {
 			if (type instanceof PrimitiveType) {
 				if (type.toString().equals("long")) {
-					w.append("Long");
+					typeName = "Long";
 				} else if (type.toString().equals("int")) {
-					w.append("Integer");
+					typeName = "Integer";
 				} else if (type.toString().equals("short")) {
-					w.append("Short");
+					typeName = "Short";
 				} else if (type.toString().equals("float")) {
-					w.append("Float");
+					typeName = "Float";
 				} else if (type.toString().equals("double")) {
-					w.append("Double");
+					typeName = "Double";
 				} else if (type.toString().equals("char")) {
-					w.append("Character");
+					typeName = "Character";
 				} else if (type.toString().equals("byte")) {
-					w.append("Byte");
+					typeName = "Byte";
 				} else if (type.toString().equals("boolean")) {
-					w.append("Boolean");
-				} else {
-					w.append(type.toString());
+					typeName = "Boolean";
 				}
-			} else {
-				String name = type.toString();
+				w.append(typeName);
+			} else {				
 				TypeMirror target = null;
 				for (int i = 0; i < annotationsWithTargetEntity.length; i++) {
 					Object targetValue = AnnotationProcessorUtils.getValueForAnnotationAttribute(member,
@@ -280,14 +281,14 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 					}
 				}
 				if (target != null) {
-					name = target.toString();
-				} else if (genericLookups != null && genericLookups.containsKey(name)) {
+					typeName = target.toString();
+				} else if (genericLookups != null && genericLookups.containsKey(typeName)) {
 					// This is a generic type, so replace with the bound type
 					// equates to "T extends MyOtherType" and putting
 					// "MyOtherType" in
-					name = genericLookups.get(name).toString();
+					typeName = genericLookups.get(typeName).toString();
 				}
-				w.append(name);
+				w.append(typeName);
 			}
 		} else if (cat == TypeCategory.MAP) {
 			TypeMirror keyType = getTypeParameter(member, type, 0, false);
@@ -295,12 +296,19 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 			TypeMirror valueType = getTypeParameter(member, type, 1, true);
 			String valueTypeName = AnnotationProcessorUtils.getDeclaredTypeName(processingEnv, valueType, true);
 			w.append(keyTypeName + ", " + valueTypeName);
+			w.append("> " + memberName + " = new " + cat.getTypeName() + "<>(\"" + memberName + "\", this, " + classSimpleName + ".class, " + keyTypeName  + ".class, " + valueTypeName + ".class);\n");
 		} else {
 			TypeMirror elementType = getTypeParameter(member, type, 0, true);
 			String elementTypeName = AnnotationProcessorUtils.getDeclaredTypeName(processingEnv, elementType, true);
 			w.append(elementTypeName);
+			if (cat == TypeCategory.LIST || cat == TypeCategory.SET || cat == TypeCategory.COLLECTION) {
+				typeName = elementTypeName;
+			}
 		}
-		w.append("> " + memberName + " = new " + cat.getTypeName() + "<>(\"" + memberName + "\", this)" + ";\n");
+		
+		if (cat != TypeCategory.MAP) {
+			w.append("> " + memberName + " = new " + cat.getTypeName() + "<>(\"" + memberName + "\", this, " + typeName + ".class);\n");
+		}
 	}
 
 	TypeMirror getTypeParameter(Element element, TypeMirror type, int position, boolean checkTarget) {

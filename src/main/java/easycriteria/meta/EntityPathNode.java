@@ -8,4 +8,5 @@ public interface EntityPathNode {
 
 	public void setParent(EntityPathNode parent);
 
+	public Class<?> getEntityType();
 }

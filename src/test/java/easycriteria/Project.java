@@ -1,11 +1,12 @@
 package easycriteria;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.MapKeyClass;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -34,6 +35,10 @@ public class Project {
 	
 	@OneToOne
 	private Dog dog;
+	
+	@OneToMany
+	@MapKeyClass(ProjectType.class)
+	private Map<ProjectType, Dog> dogsByProject;
 
 	public int getId() {
 		return id;
@@ -89,5 +94,13 @@ public class Project {
 
 	public void setDog(Dog dog) {
 		this.dog = dog;
+	}
+
+	public Map<ProjectType, Dog> getDogsByProject() {
+		return dogsByProject;
+	}
+
+	public void setDogsByProject(Map<ProjectType, Dog> dogsByProject) {
+		this.dogsByProject = dogsByProject;
 	}
 }

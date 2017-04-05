@@ -9,12 +9,12 @@ import easycriteria.where.WhereCondition;
 
 public class NumberPropertyAttribute<X, T> extends PropertyAttribute<X, T>{
 
-	public NumberPropertyAttribute(String attribute) {
-		super(attribute);
+	public NumberPropertyAttribute(String attribute, Class<T> entityType) {
+		super(attribute, entityType);
 	}
 
-	public NumberPropertyAttribute(String attribute, EntityPathNode parentPath) {
-		super(attribute, parentPath);
+	public NumberPropertyAttribute(String attribute, EntityPathNode parentPath, Class<T> entityType) {
+		super(attribute, parentPath, entityType);
 	}
 	
 	public WhereCondition greaterThan(T value) {

@@ -20,8 +20,8 @@ import easycriteria.where.WhereCondition;
  */
 public class CollectionAttribute<X, T> extends ObjectAttribute<T> {
 	
-	public CollectionAttribute(String attribute, EntityPathNode parentPath) {
-		super(attribute, parentPath);
+	public CollectionAttribute(String attribute, EntityPathNode parentPath, Class<T> entityType) {
+		super(attribute, parentPath, entityType);
 	}
 
 	public WhereCondition in(Collection<T> args) {
