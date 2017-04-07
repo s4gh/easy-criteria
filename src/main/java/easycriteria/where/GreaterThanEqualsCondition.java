@@ -3,30 +3,28 @@ package easycriteria.where;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.SingularAttribute;
 
-public class GreaterThanEqualsCondition<E, A> implements WhereCondition {
+import easycriteria.meta.EntityPathNode;
 
-	@SuppressWarnings("rawtypes")
-	private final SingularAttribute attribute;
+public class GreaterThanEqualsCondition<A> extends WhereCondition {
+
 	private final A value;
-	private final Path<E> parentPath;
 
-	public GreaterThanEqualsCondition(SingularAttribute<E, A> attribute, A value, Path<E> parentPath) {
+	public GreaterThanEqualsCondition(String attribute, A value, EntityPathNode parentAttribute) {
 		this.attribute = attribute;
 		this.value = value;
-		this.parentPath = parentPath;
+		this.parentAttribute = parentAttribute;
 	}
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Predicate buildPredicate(CriteriaBuilder builder) {
-		return builder.greaterThanOrEqualTo(parentPath.get(attribute), (Comparable) value);
+	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
+		return builder.greaterThanOrEqualTo(path.get(attribute), (Comparable) value);
 	}
 
 	@Override
 	public String toString() {
 
-		return parentPath.toString() + "." + attribute.getName() + " >= " + value;
+		return parentPath.toString() + "." + attribute + " >= " + value;
 	}
 }

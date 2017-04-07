@@ -1,27 +1,26 @@
 package easycriteria.where;
 
-import java.util.Collection;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 
+import easycriteria.EasyCriteriaSubQuery;
 import easycriteria.meta.EntityPathNode;
 
-public class InCondition<A> extends WhereCondition {
+public class InSubQueryCondition<A> extends WhereCondition {
 
-	private final Collection<A> args;
+	private final EasyCriteriaSubQuery<?, A> subQuery;
 	private boolean positiveCondition = true;
 
-	public InCondition(String attribute, Collection<A> args, EntityPathNode parentAttribute) {
+	public InSubQueryCondition(String attribute, EasyCriteriaSubQuery<?, A> subQuery, EntityPathNode parentAttribute) {
 		this.attribute = attribute;
-		this.args = args;
+		this.subQuery = subQuery;
 		this.parentAttribute = parentAttribute;
 	}
 	
-	public InCondition(String attribute, Collection<A> args, EntityPathNode parentAttribute, boolean positiveCondition) {
+	public InSubQueryCondition(String attribute, EasyCriteriaSubQuery<?, A> subQuery, EntityPathNode parentAttribute, boolean positiveCondition) {
 		this.attribute = attribute;
-		this.args = args;
+		this.subQuery = subQuery;
 		this.parentAttribute = parentAttribute;
 		this.positiveCondition = positiveCondition;
 	}
@@ -30,7 +29,7 @@ public class InCondition<A> extends WhereCondition {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
 
-		Predicate inConditionPredicate = path.get(attribute).in(args);
+		Predicate inConditionPredicate = path.get(attribute).in(subQuery.getCriteriaSubQuery());
 		if (!positiveCondition) {
 			inConditionPredicate = builder.not(inConditionPredicate);
 		}
@@ -40,6 +39,6 @@ public class InCondition<A> extends WhereCondition {
 	@Override
 	public String toString() {
 		String not = (positiveCondition) ? "" : " not";
-		return parentPath.toString() + "." + attribute + not + " in " + args;
+		return parentPath.toString() + "." + attribute + not + " in " + subQuery.toString();
 	}
 }

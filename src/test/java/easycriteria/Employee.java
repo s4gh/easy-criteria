@@ -17,7 +17,7 @@ import org.hibernate.annotations.Type;
 public class Employee {
     
 	@Id
-    @GeneratedValue
+    @GeneratedValue 
     private int id;
     
     private String fullName;

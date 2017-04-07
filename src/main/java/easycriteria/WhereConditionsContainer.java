@@ -4,6 +4,6 @@ import easycriteria.where.WhereCondition;
 
 public interface WhereConditionsContainer {
 
-	public void addWhereClause(WhereCondition whereClause);
+	public void addWhereCondition(WhereCondition whereClause);
 
 }

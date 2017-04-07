@@ -6,26 +6,28 @@ import javax.persistence.criteria.Predicate;
 
 import easycriteria.meta.EntityPathNode;
 
-public class GreaterThanCondition<A> extends WhereCondition {
+public class CollectionSizeBetweenCondition extends WhereCondition {
 
-	private final A value;
+	private final int start;
+	private final int end;
 
-	public GreaterThanCondition(String attribute, A value, EntityPathNode parentAttribute) {
+	public CollectionSizeBetweenCondition(String attribute, int start, int end, EntityPathNode parentAttribute) {
 		this.attribute = attribute;
-		this.value = value;
+		this.start = start;
+		this.end = end;
 		this.parentAttribute = parentAttribute;
 	}
 
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
-
-		return builder.greaterThan(path.get(attribute), (Comparable) value);
+		
+		return builder.between(builder.size(path.get(attribute)), start, end);
 	}
 
 	@Override
 	public String toString() {
 
-		return parentPath.toString() + "." + attribute + " > " + value;
+		return parentPath.toString() + "." + attribute + " size between " + start + " and " + end;
 	}
 }

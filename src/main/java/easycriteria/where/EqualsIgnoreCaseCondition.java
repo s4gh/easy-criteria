@@ -6,25 +6,25 @@ import javax.persistence.criteria.Predicate;
 
 import easycriteria.meta.EntityPathNode;
 
-public class EqualsCondition<A> extends WhereCondition {
+public class EqualsIgnoreCaseCondition extends WhereCondition {
 
-	private final A value;
+	private final String value;
 
-	public EqualsCondition(String attribute, A object) {
+	public <T> EqualsIgnoreCaseCondition(String attribute, String object) {
 		this.attribute = attribute;
 		this.value = object;
 	}
-	
-	public EqualsCondition(String attribute, A object, EntityPathNode parentAttribute) {
+
+	public <T> EqualsIgnoreCaseCondition(String attribute, String object, EntityPathNode parentAttribute) {
 		this.attribute = attribute;
 		this.value = object;
 		this.parentAttribute = parentAttribute;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	protected Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
-		return builder.equal(path.get(attribute), value);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
+		return builder.equal(builder.upper(path.get(attribute)), value.toUpperCase());
 	}
 
 	@Override

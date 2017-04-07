@@ -6,25 +6,26 @@ import javax.persistence.criteria.Predicate;
 
 import easycriteria.meta.EntityPathNode;
 
-public class LessThanEqualsCondition<A> extends WhereCondition {
+public class CollectionSizeLessThanCondition extends WhereCondition {
 
-	private final A value;
+	private final int value;
 
-	public LessThanEqualsCondition(String attribute, A value, EntityPathNode parentAttribute) {
+	public CollectionSizeLessThanCondition(String attribute, int value, EntityPathNode parentAttribute) {
 		this.attribute = attribute;
 		this.value = value;
 		this.parentAttribute = parentAttribute;
 	}
-	
+
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
-		return builder.lessThanOrEqualTo(path.get(attribute), (Comparable) value);
+		
+		return builder.lessThan(builder.size(path.get(attribute)), value);
 	}
 
 	@Override
 	public String toString() {
 
-		return parentPath.toString() + "." + attribute + " <= " + value;
+		return parentPath.toString() + "." + attribute + " size < " + value;
 	}
 }
