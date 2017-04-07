@@ -20,22 +20,19 @@ import org.junit.Test;
 public class EasyCriteriaQueryTest {
 
 	private EntityManager entityManager;
-	private JPAQuery query;
 
 	@Before
 	public void setup() {
 		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("easycriteria");
 
 		entityManager = entityManagerFactory.createEntityManager();
-
-		query = new JPAQuery(entityManager);
 	}
 
 	@Test
 	public void testGetAll() {
 		createEmployee("MyName");
 
-		List<Employee> employees = query.select(Employee.class).getResultList();
+		List<Employee> employees = new JPAQuery(entityManager).select(Employee.class).getResultList();
 
 		assertEquals(1, employees.size());
 	}
@@ -47,7 +44,7 @@ public class EasyCriteriaQueryTest {
 		createEmployee("SomeName3");
 		
 		QEmployee_ employee = new QEmployee_();
-		List<Long> employees = query.count(Employee.class).where(employee.fullName.in(Arrays.asList("SomeName1", "SomeName3"))).getResultList();
+		List<Long> employees = new JPAQuery(entityManager).count(Employee.class).where(employee.fullName.in(Arrays.asList("SomeName1", "SomeName3"))).getResultList();
 
 		assertEquals(1, employees.size());
 		assertEquals(2, employees.get(0).intValue());
@@ -60,7 +57,7 @@ public class EasyCriteriaQueryTest {
 		createEmployee("SomeName3");
 
 		QEmployee_ employee = new QEmployee_();
-		List<Employee> employees = query.select(Employee.class).where(employee.fullName.in(Arrays.asList("SomeName1", "SomeName3"))).getResultList();
+		List<Employee> employees = new JPAQuery(entityManager).select(Employee.class).where(employee.fullName.in(Arrays.asList("SomeName1", "SomeName3"))).getResultList();
 
 		assertEquals(2, employees.size());
 	}
@@ -72,7 +69,7 @@ public class EasyCriteriaQueryTest {
 		createEmployee("otherName3");
 
 		QEmployee_ employee = new QEmployee_();
-		List<Employee> employees = query.select(Employee.class).where(employee.fullName.like("name%"))
+		List<Employee> employees = new JPAQuery(entityManager).select(Employee.class).where(employee.fullName.like("name%"))
 				.getResultList();
 
 		assertEquals(2, employees.size());
@@ -85,7 +82,7 @@ public class EasyCriteriaQueryTest {
 		createEmployee("i3");
 
 		QEmployee_ employee = new QEmployee_();
-		List<String> employees = query.select(employee.fullName).getResultList();
+		List<String> employees = new JPAQuery(entityManager).select(employee.fullName).getResultList();
 
 		assertTrue(Arrays.asList("i1", "i2", "i3").containsAll(employees));
 	}
@@ -97,12 +94,12 @@ public class EasyCriteriaQueryTest {
 		createEmployee("desc3");
 
 		QEmployee_ employee = new QEmployee_();
-		Employee employees = query.select(Employee.class).where(employee.fullName.eq("desc3")).getSingleResult();
+		Employee employees = new JPAQuery(entityManager).select(Employee.class).where(employee.fullName.eq("desc3")).getSingleResult();
 
 		assertEquals("desc3", employees.getFullName());
 
 		try {
-			query.select(Employee.class).getSingleResult();
+			new JPAQuery(entityManager).select(Employee.class).getSingleResult();
 			fail();
 
 		} catch (NonUniqueResultException e) {
@@ -119,14 +116,14 @@ public class EasyCriteriaQueryTest {
 		Employee employee3 = createEmployee("name2", 2);
 
 		QEmployee_ employee = new QEmployee_();
-		List<Employee> employees = query.select(Employee.class).orderBy(employee.age.asc())
+		List<Employee> employees = new JPAQuery(entityManager).select(Employee.class).orderBy(employee.age.asc())
 				.getResultList();
 
 		assertTrue(Arrays.asList(employee2, employee3, employee1).containsAll(employees));
 		assertTrue(employees.equals(Arrays.asList(employee2, employee3, employee1)));
 		assertFalse(employees.equals(Arrays.asList(employee1, employee2, employee3)));
 
-		employees = query.select(Employee.class).where(employee.fullName.eq("name")).orderBy(employee.age.asc())
+		employees = new JPAQuery(entityManager).select(Employee.class).where(employee.fullName.eq("name")).orderBy(employee.age.asc())
 				.getResultList();
 
 		assertTrue(Arrays.asList(employee2, employee1).containsAll(employees));
@@ -143,7 +140,7 @@ public class EasyCriteriaQueryTest {
 		Employee employee4 = createEmployee("aaa", 3);					
 
 		QEmployee_ employee = new QEmployee_();
-		List<Employee> employees = query.select(Employee.class)
+		List<Employee> employees = new JPAQuery(entityManager).select(Employee.class)
 				.orderBy(employee.age.asc(),employee.fullName.asc()) 
 				.getResultList();
 
@@ -161,20 +158,20 @@ public class EasyCriteriaQueryTest {
 		
 		QEmployee_ employee = new QEmployee_();
 
-		assertEquals(Long.valueOf(3), query.count(Employee.class).getSingleResult());
+		assertEquals(Long.valueOf(3), new JPAQuery(entityManager).count(Employee.class).getSingleResult());
 
-		assertEquals(Long.valueOf(2), query.count(Employee.class).where(employee.fullName.eq("name")).getSingleResult());
+		assertEquals(Long.valueOf(2), new JPAQuery(entityManager).count(Employee.class).where(employee.fullName.eq("name")).getSingleResult());
 
-		assertFalse(query.count(Employee.class).where(employee.fullName.eq("tedf")).getSingleResult() > 0);
+		assertFalse(new JPAQuery(entityManager).count(Employee.class).where(employee.fullName.eq("tedf")).getSingleResult() > 0);
 
-		assertTrue(query.count(Employee.class).getSingleResult() > 0);
+		assertTrue(new JPAQuery(entityManager).count(Employee.class).getSingleResult() > 0);
 	}
 
 	@Test
 	public void testNotFound() {
 		try {
 			QEmployee_ employee = new QEmployee_();
-			query.select(Employee.class).where(employee.id.eq(15736)).getSingleResult();
+			new JPAQuery(entityManager).select(Employee.class).where(employee.id.eq(15736)).getSingleResult();
 		} catch (NoResultException e) {
 			// expected
 			return;
@@ -196,7 +193,7 @@ public class EasyCriteriaQueryTest {
 
 		QEmployee_ employee = new QEmployee_();
 		
-		List<Employee> employees = query.select(Employee.class)
+		List<Employee> employees = new JPAQuery(entityManager).select(Employee.class)
 					.where(employee.fullName.eq("Sergio").or(employee.fullName.eq("Name1")).or(employee.fullName.like("Second%")))
 				.getResultList();
 
@@ -222,7 +219,7 @@ public class EasyCriteriaQueryTest {
 
 		QEmployee_ employee = new QEmployee_();
 		
-		List<Employee> employees = query.select(Employee.class)
+		List<Employee> employees = new JPAQuery(entityManager).select(Employee.class)
 				.where(
 					employee.fullName.eq("Something").or(
 							employee.fullName.eq("Other 1").and(
@@ -252,7 +249,7 @@ public class EasyCriteriaQueryTest {
 		
 		QEmployee_ employee = new QEmployee_();
 		
-		List<Employee> emp = query.select(Employee.class)
+		List<Employee> emp = new JPAQuery(entityManager).select(Employee.class)
 				.where(employee.dateTimeProperty.between(from, to))
 				.getResultList();
 		assertEquals(4, emp.size());		
@@ -266,20 +263,20 @@ public class EasyCriteriaQueryTest {
 		QAddress_ address = new QAddress_();
 		QDepartment_ department = new QDepartment_();
 		
-		List<Employee> emp = query.select(Employee.class)
+		List<Employee> emp = new JPAQuery(entityManager).select(Employee.class)
 			.where(employee.address.address.eq("address1"))
 			.getResultList();
 		assertEquals(2, emp.size());
 		
 		
-		List<Employee> empJoin = query.select(Employee.class)
+		List<Employee> empJoin = new JPAQuery(entityManager).select(Employee.class)
 				.join(employee.address, JoinType.INNER, address)
 					.on(address.address.eq("address1"))
 				.endJoin()				
 				.getResultList();
 			assertEquals(2, empJoin.size());
 		
-		List<Employee> emp1 = query.select(Employee.class)
+		List<Employee> emp1 = new JPAQuery(entityManager).select(Employee.class)
 				.where(
 					employee.address.address.eq("address1").or(employee.position.eq("position2"))				
 				)
@@ -287,13 +284,13 @@ public class EasyCriteriaQueryTest {
 		assertEquals(3, emp1.size());
 		
 		
-		List<Department> departments = query.select(Department.class)
+		List<Department> departments = new JPAQuery(entityManager).select(Department.class)
 				.where(department.manager.address.address.eq("address1"))				
 				.getResultList();
 		assertEquals(1, departments.size());
 		assertEquals("dep_prod", departments.get(0).getName());
 				
-		List<Department> departmentsJoin = query.select(Department.class)
+		List<Department> departmentsJoin = new JPAQuery(entityManager).select(Department.class)
 				.join(department.manager, JoinType.INNER)
 					.join(employee.address, JoinType.INNER, address)
 						.on(address.address.eq("address1"))
@@ -312,7 +309,7 @@ public class EasyCriteriaQueryTest {
 		QAddress_ address = new QAddress_();
 		QDepartment_ department = new QDepartment_();
 		
-		List<Department> departments = query.select(Department.class)		
+		List<Department> departments = new JPAQuery(entityManager).select(Department.class)		
 		.join(department.manager, JoinType.LEFT, employee)
 			.on(employee.fullName.eq("fullName1"))					
 		.endJoin()
@@ -320,7 +317,7 @@ public class EasyCriteriaQueryTest {
 		assertEquals("dep_prod", departments.get(0).getName());
 		
 		
-		List<Department> departments1 = query.select(Department.class)		
+		List<Department> departments1 = new JPAQuery(entityManager).select(Department.class)		
 				.join(department.manager, JoinType.LEFT)
 					.join(employee.address, JoinType.INNER, address)
 						.on(address.address.eq("address3"))
@@ -329,7 +326,7 @@ public class EasyCriteriaQueryTest {
 				.getResultList();
 		assertEquals("dep_sales", departments1.get(0).getName());
 		
-		List<Department> departments2 = query.select(Department.class)		
+		List<Department> departments2 = new JPAQuery(entityManager).select(Department.class)		
 				.join(department.employees, JoinType.INNER, employee)
 					.on(employee.position.like("position2%"))
 				.endJoin()
@@ -338,6 +335,20 @@ public class EasyCriteriaQueryTest {
 		assertEquals("dep_sales", departments2.get(0).getName());
 		assertEquals("dep_prod", departments2.get(1).getName());
 		assertEquals(2, departments2.size());
+	}
+	
+	@Test
+	public void testSubQuery() {
+		
+		setupDepartementsTestData();
+		
+		QEmployee_ employee = new QEmployee_();		
+		
+		EasyCriteriaQuery<Employee, Employee> query = new JPAQuery(entityManager).select(Employee.class);
+		EasyCriteriaSubQuery<Employee, Integer> subQuery = query.subQuerySelect(employee.id).where(employee.fullName.eq("fullName1"));
+		List<Employee> emp = query.where(employee.id.in(subQuery)).getResultList();		
+		
+		assertEquals(2, emp.size());		
 	}
 	
 	private Employee createEmployee(String fullName) {		

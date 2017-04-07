@@ -7,7 +7,8 @@ import easycriteria.where.WhereCondition;
 /**
  * 
  * @param <X> The type containing the represented attribute
- * @param <T> The type of the represented attribute
+ * @param <K> The type of the key
+ * @param <V> The type of the value
  */
 public class MapAttribute<X, K, V> implements EntityPathNode {
 	

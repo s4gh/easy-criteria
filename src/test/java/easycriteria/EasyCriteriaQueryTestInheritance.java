@@ -15,15 +15,12 @@ import org.junit.Test;
 public class EasyCriteriaQueryTestInheritance {
 
 	private EntityManager entityManager;
-	private JPAQuery query;
 
 	@Before
 	public void setup() {
 		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("easycriteria");
 
 		entityManager = entityManagerFactory.createEntityManager();
-
-		query = new JPAQuery(entityManager);
 	}
 
 	@Test
@@ -32,18 +29,18 @@ public class EasyCriteriaQueryTestInheritance {
 		
 		QDog_ dog = new QDog_();
 		
-		List<Dog> dogs1 = query.select(Dog.class).where(dog.petAddress.zip.eq("zip1")).getResultList();
+		List<Dog> dogs1 = new JPAQuery(entityManager).select(Dog.class).where(dog.petAddress.zip.eq("zip1")).getResultList();
 		assertEquals(1, dogs1.size());
 		
 		QLargeProject_ largeProject = new QLargeProject_();
 		QHomeAnimal_ homeAnimal = new QHomeAnimal_();
 		
-		List<LargeProject> projects = query.select(LargeProject.class)
+		List<LargeProject> projects = new JPAQuery(entityManager).select(LargeProject.class)
 				.where(largeProject.type.eq(ProjectType.DEVELOPMENT))
 				.getResultList();
 		assertEquals(1, projects.size());
 		
-		List<LargeProject> projects1 = query.select(LargeProject.class)
+		List<LargeProject> projects1 = new JPAQuery(entityManager).select(LargeProject.class)
 				.join(largeProject.homeAnimal, JoinType.INNER, homeAnimal)
 					.on(homeAnimal.owner.eq("owner1"))
 				.endJoin()

@@ -14,13 +14,13 @@ public class JPAQuery {
 
 	public JPAQuery(EntityManager entityManager) {
 		this.entityManager = entityManager;
-	}
+	}	
 
 	public <S> EasyCriteriaQuery<S, S> select(Class<S> entityClass) {
 
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 
-		CriteriaQuery<S> criteriaQuery = criteriaBuilder.createQuery(entityClass);
+		CriteriaQuery<S> criteriaQuery = criteriaBuilder.createQuery(entityClass);		
 
 		Root<S> root = criteriaQuery.from(entityClass);
 

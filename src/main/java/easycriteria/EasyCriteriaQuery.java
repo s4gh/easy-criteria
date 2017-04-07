@@ -6,8 +6,10 @@ import java.util.List;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import easycriteria.meta.ObjectAttribute;
+import easycriteria.meta.PropertyAttribute;
 import easycriteria.where.WhereCondition;
 
 public class EasyCriteriaQuery<E, S> implements WhereConditionsContainer {
@@ -119,6 +121,18 @@ public class EasyCriteriaQuery<E, S> implements WhereConditionsContainer {
 
 	protected int getRowCount() {
 		return rowCount;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> EasyCriteriaSubQuery<E, T> subQuerySelect(PropertyAttribute<E, T> selectAttribute) {
+
+		Subquery<T> criteriaSubQuery = criteriaQuery.subquery(selectAttribute.getPropertyType());		
+
+		Root<E> root = (Root<E>) criteriaSubQuery.from(selectAttribute.getEntityType());
+
+		criteriaSubQuery.select(root.get(selectAttribute.getAttribute()));
+
+		return new EasyCriteriaSubQuery<>(criteriaSubQuery, whereTransformer, root);
 	}
 
 	@Override

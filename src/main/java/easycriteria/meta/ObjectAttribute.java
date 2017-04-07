@@ -6,7 +6,6 @@ import easycriteria.where.WhereCondition;
 
 /**
  * 
- * @param <X> The type containing the represented attribute
  * @param <T> The type of the represented attribute
  */
 public class ObjectAttribute<T> implements EntityPathNode {

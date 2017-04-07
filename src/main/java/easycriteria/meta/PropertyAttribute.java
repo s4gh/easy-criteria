@@ -2,9 +2,11 @@ package easycriteria.meta;
 
 import java.util.Collection;
 
+import easycriteria.EasyCriteriaSubQuery;
 import easycriteria.OrderBy;
 import easycriteria.where.EqualsCondition;
 import easycriteria.where.InCondition;
+import easycriteria.where.InSubQueryCondition;
 import easycriteria.where.IsNotNullCondition;
 import easycriteria.where.IsNullCondition;
 import easycriteria.where.NotEqualsCondition;
@@ -52,6 +54,18 @@ public class PropertyAttribute<X, T> implements EntityPathNode {
 	
 	public WhereCondition in(Collection<T> args) {
 		return new InCondition<T>(attribute, args, parentPath);
+	}
+	
+	public WhereCondition notIn(Collection<T> args) {
+		return new InCondition<T>(attribute, args, parentPath, false);
+	}
+	
+	public WhereCondition in(EasyCriteriaSubQuery<?, T> subQuery) {
+		return new InSubQueryCondition<T>(attribute, subQuery, parentPath);
+	}
+	
+	public WhereCondition notIn(EasyCriteriaSubQuery<?, T> subQuery) {
+		return new InSubQueryCondition<T>(attribute, subQuery, parentPath, false);
 	}
 	
 	public WhereCondition isNull() {
