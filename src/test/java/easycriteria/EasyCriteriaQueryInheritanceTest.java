@@ -2,6 +2,7 @@ package easycriteria;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -12,7 +13,7 @@ import javax.persistence.criteria.JoinType;
 import org.junit.Before;
 import org.junit.Test;
 
-public class EasyCriteriaQueryTestInheritance {
+public class EasyCriteriaQueryInheritanceTest {
 
 	private EntityManager entityManager;
 
@@ -49,6 +50,20 @@ public class EasyCriteriaQueryTestInheritance {
 	}
 	
 	
+	@Test
+	public void testCollectionContainsElement() {
+		
+		setupAnimalsTestData();
+		
+		QLargeProject_ largeProject = new QLargeProject_();
+		QAnimal_ animal = new QAnimal_();
+		
+		List<Animal> animals = new JPAQuery(entityManager).select(Animal.class).where(animal.name.eq("animal3")).getResultList();
+		EasyCriteriaQuery<LargeProject, LargeProject> query = new JPAQuery(entityManager).select(LargeProject.class);
+		List<LargeProject> projects = query.where(largeProject.animals.contains(animals.get(0))).getResultList();		
+		assertEquals("project1", projects.get(0).getName());
+	}
+	
 	private void setupAnimalsTestData() {
 		beginTx();
 
@@ -57,11 +72,11 @@ public class EasyCriteriaQueryTestInheritance {
 		entityManager.persist(a1);
 		
 		Animal a2 = new Animal();
-		a1.setName("animal2");
+		a2.setName("animal2");
 		entityManager.persist(a2);
 		
 		Animal a3 = new Animal();
-		a1.setName("animal3");
+		a3.setName("animal3");
 		entityManager.persist(a3);
 		
 		//-------------------
@@ -156,6 +171,7 @@ public class EasyCriteriaQueryTestInheritance {
 		p1.setTheAnimal(d1);
 		p1.setHomeAnimal(ha1);
 		p1.setDog(d2);
+		p1.setAnimals(Arrays.asList(a1,a3));
 		entityManager.persist(p1);
 		
 		
@@ -164,6 +180,7 @@ public class EasyCriteriaQueryTestInheritance {
 		p2.setType(ProjectType.RESEARCH);
 		p2.setTheAnimal(d2);
 		p2.setHomeAnimal(ha2);
+		p2.setAnimals(Arrays.asList(a1,a2));
 		entityManager.persist(p2);
 		
 		commitTx();

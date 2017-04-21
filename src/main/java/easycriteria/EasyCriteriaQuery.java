@@ -124,7 +124,7 @@ public class EasyCriteriaQuery<E, S> implements WhereConditionsContainer {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> EasyCriteriaSubQuery<E, T> subQuerySelect(PropertyAttribute<E, T> selectAttribute) {
+	public <T> EasyCriteriaSubquery<E, T> subquerySelect(PropertyAttribute<E, T> selectAttribute) {
 
 		Subquery<T> criteriaSubQuery = criteriaQuery.subquery(selectAttribute.getPropertyType());		
 
@@ -132,7 +132,18 @@ public class EasyCriteriaQuery<E, S> implements WhereConditionsContainer {
 
 		criteriaSubQuery.select(root.get(selectAttribute.getAttribute()));
 
-		return new EasyCriteriaSubQuery<>(criteriaSubQuery, whereTransformer, root);
+		return new EasyCriteriaSubquery<>(criteriaSubQuery, whereTransformer, root);
+	}
+	
+	public <T> EasyCriteriaSubquery<T, T> subquerySelect(Class<T> entityClass) {
+
+		Subquery<T> criteriaSubQuery = criteriaQuery.subquery(entityClass);
+		
+		Root<T> root = criteriaSubQuery.from(entityClass);
+		
+		criteriaSubQuery.select(root);
+
+		return new EasyCriteriaSubquery<>(criteriaSubQuery, whereTransformer, root);
 	}
 
 	@Override

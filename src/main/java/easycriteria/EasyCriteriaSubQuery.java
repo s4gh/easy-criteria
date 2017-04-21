@@ -10,35 +10,35 @@ import javax.persistence.criteria.Subquery;
 import easycriteria.meta.ObjectAttribute;
 import easycriteria.where.WhereCondition;
 
-public class EasyCriteriaSubQuery<E, T> implements WhereConditionsContainer {
+public class EasyCriteriaSubquery<E, T> implements WhereConditionsContainer {
 
-	private List<WhereCondition> whereClauses;
-	private Subquery<T> criteriaSubQuery;
+	private List<WhereCondition> whereClauses;	
 	private WhereTransformer whereTransformer;
+	private Subquery<T> criteriaSubquery;
 	private Root<E> root;
 
-	public EasyCriteriaSubQuery(Subquery<T> criteriaSubQuery, WhereTransformer whereTransformer, Root<E> root) {
+	public EasyCriteriaSubquery(Subquery<T> criteriaSubquery, WhereTransformer whereTransformer, Root<E> root) {
 		this.whereClauses = new ArrayList<>();
-		this.criteriaSubQuery = criteriaSubQuery;
+		this.criteriaSubquery = criteriaSubquery;
 		this.whereTransformer = whereTransformer;
 		this.root = root;
 	}
 	
-	public EasyCriteriaSubQuery<E, T> where(WhereCondition whereCondition){
+	public EasyCriteriaSubquery<E, T> where(WhereCondition whereCondition){
 		addWhereCondition(whereCondition);
 		return this;
 	}
 	
-	public <A> JoinBuilder<E, A, T, EasyCriteriaSubQuery<E, T>> join(ObjectAttribute<A> attribute,
+	public <A> JoinBuilder<E, A, T, EasyCriteriaSubquery<E, T>> join(ObjectAttribute<A> attribute,
 			JoinType joinType) {
 
-		return new JoinBuilder<E, A, T, EasyCriteriaSubQuery<E, T>>(attribute.getAttribute(), this, whereTransformer, joinType, root);
+		return new JoinBuilder<E, A, T, EasyCriteriaSubquery<E, T>>(attribute.getAttribute(), this, whereTransformer, joinType, root);
 	}
 	
-	public <A> JoinBuilder<E, A, T, EasyCriteriaSubQuery<E, T>> join(ObjectAttribute<A> attribute,
+	public <A> JoinBuilder<E, A, T, EasyCriteriaSubquery<E, T>> join(ObjectAttribute<A> attribute,
 			JoinType joinType, ObjectAttribute<A> alias) {
 
-		return new JoinBuilder<E, A, T, EasyCriteriaSubQuery<E, T>>(attribute.getAttribute(), this, whereTransformer, joinType, root);
+		return new JoinBuilder<E, A, T, EasyCriteriaSubquery<E, T>>(attribute.getAttribute(), this, whereTransformer, joinType, root);
 	}
 
 	public void addWhereCondition(WhereCondition whereClause) {
@@ -51,8 +51,8 @@ public class EasyCriteriaSubQuery<E, T> implements WhereConditionsContainer {
 		return whereClauses;
 	}
 
-	public Subquery<T> getCriteriaSubQuery() {
-		return criteriaSubQuery.where(whereTransformer.transform(getWhereClauses(), getRoot()));
+	public Subquery<T> getCriteriaSubquery() {
+		return criteriaSubquery.where(whereTransformer.transform(getWhereClauses(), getRoot()));
 	}
 
 	public Root<E> getRoot() {

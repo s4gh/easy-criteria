@@ -1,9 +1,6 @@
 package easycriteria.meta;
 
-import java.util.Collection;
-
 import easycriteria.where.CollectionEmptyCondition;
-import easycriteria.where.InCondition;
 import easycriteria.where.CollectionMemberOfCondition;
 import easycriteria.where.CollectionSizeBetweenCondition;
 import easycriteria.where.CollectionSizeEqualsCondition;
@@ -22,14 +19,6 @@ public class CollectionAttribute<X, T> extends ObjectAttribute<T> {
 	
 	public CollectionAttribute(String attribute, EntityPathNode parentPath, Class<T> entityType) {
 		super(attribute, parentPath, entityType);
-	}
-
-	public WhereCondition in(Collection<T> args) {
-		return new InCondition<T>(getAttribute(), args, getParent());
-	}
-	
-	public WhereCondition notIn(Collection<T> args) {
-		return new InCondition<T>(getAttribute(), args, getParent(), false);
 	}
 	
 	public WhereCondition contains(T element) {

@@ -4,7 +4,7 @@
 	<groupId>io.github.sveryovka</groupId>
 	<artifactId>easy-criteria</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0</version>
+	<version>2.0.1</version>
 
 	<name>easy-criteria</name>
 	<description>Convenience wrapper on top of JPA Criteria Query</description>

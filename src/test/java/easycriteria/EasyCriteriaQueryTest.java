@@ -338,14 +338,14 @@ public class EasyCriteriaQueryTest {
 	}
 	
 	@Test
-	public void testSubQuery() {
+	public void testSubquery() {
 		
 		setupDepartementsTestData();
 		
 		QEmployee_ employee = new QEmployee_();		
 		
 		EasyCriteriaQuery<Employee, Employee> query = new JPAQuery(entityManager).select(Employee.class);
-		EasyCriteriaSubQuery<Employee, Integer> subQuery = query.subQuerySelect(employee.id).where(employee.fullName.eq("fullName1"));
+		EasyCriteriaSubquery<Employee, Integer> subQuery = query.subquerySelect(employee.id).where(employee.fullName.eq("fullName1"));
 		List<Employee> emp = query.where(employee.id.in(subQuery)).getResultList();		
 		
 		assertEquals(2, emp.size());		
