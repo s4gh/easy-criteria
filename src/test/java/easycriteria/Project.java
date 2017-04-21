@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyClass;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
@@ -24,7 +25,8 @@ public class Project {
 	
 	private ProjectType type;
 	
-	@OneToMany()
+	@OneToMany
+	@JoinColumn(name="OWNER_ID")
 	private List<Animal> animals;
 	
 	@OneToOne

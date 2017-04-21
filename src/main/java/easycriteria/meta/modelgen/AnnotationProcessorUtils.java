@@ -135,8 +135,7 @@ public class AnnotationProcessorUtils {
 
 	public static boolean isFieldJPAAEntity(Element el) {
 
-		if ((el.getAnnotation(OneToOne.class) != null) || (el.getAnnotation(JoinColumn.class) != null)
-				|| (el.getAnnotation(Embedded.class) != null)) {
+		if ((el.getAnnotation(OneToOne.class) != null) || (el.getAnnotation(Embedded.class) != null)) {
 			return true;
 		}
 		return false;

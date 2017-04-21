@@ -4,7 +4,8 @@ This is convenience layer on top of JPA Criteria API which allows to write follo
 QEmployee_ employee = new QEmployee_();
 List<Employee> employees = query.select(Employee.class)
 				.where(employee.fullName.like("John%"))
-				.orderBy(employee.age.asc())				
+				.orderBy(employee.age.asc())
+				.limit(20, 10)							
 				.getResultList();
 ```
 Design goals used during creation of this library:
@@ -19,7 +20,7 @@ Add dependency to your project:
 <dependency>
     <groupId>io.github.sveryovka</groupId>
     <artifactId>easy-criteria</artifactId>
-    <version>2.0</version>
+    <version>2.0.1</version>
 </dependency>
 ```
 ## Generate Metamodel
@@ -37,10 +38,27 @@ List<Employee> employees = new JPAQuery(entityManager).select(Employee.class).ge
 QEmployee_ employee = new QEmployee_();
 List<Employee> employees = query.select(employee)
 				.where(employee.fullName.like("John%"))
-				.orderBy(employee.age.asc())				
+				.orderBy(employee.age.asc())
+				.limit(20, 10)				
 				.getResultList();
 ```
-Please pay attention that before executing query you need to create instance of metamodel class ```QEmployee_``` to be able to use it in query.
+Please pay attention that before executing query you need to create instance of metamodel class ```QEmployee_``` to be able to use it in query. 
+
+## Paging
+API has two methods:
+```
+limit(int rowCount)
+
+limit(int offset, int rowCount) 
+
+```
+Example:
+```java
+List<Employee> employees = query.select(Employee.class)				
+				.limit(20, 10)				
+				.getResultList();
+```
+
 
 ## Complex WHERE clause
 To reproduce SQL query
@@ -100,6 +118,16 @@ List<LargeProject> projects = query.select(LargeProject.class)
 				.getResultList();
 ```
 In this example when we perform join ```join(largeProject.homeAnimal, JoinType.INNER, homeAnimal)``` we specify join type ```JoinType.INNER``` and join table alias ```homeAnimal``` which is later used to filter results.
+
+## Subquery
+To create instance of "subquery" you need to have instance of "query" created first. 
+```java
+		QEmployee_ employee = new QEmployee_();		
+		
+		EasyCriteriaQuery<Employee, Employee> query = new JPAQuery(entityManager).select(Employee.class);
+		EasyCriteriaSubquery<Employee, Integer> subQuery = query.subquerySelect(employee.id).where(employee.fullName.eq("fullName1"));
+		List<Employee> emp = query.where(employee.id.in(subQuery)).getResultList()
+```
 
 ## Limitations
 Currently map joins are not supported. Use JPA API directly to construct queries which require map joins.
