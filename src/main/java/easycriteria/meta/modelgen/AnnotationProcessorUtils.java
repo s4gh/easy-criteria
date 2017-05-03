@@ -19,11 +19,8 @@ import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
 
 /**
  * Series of method to aid in the writing of annotation processors.
@@ -133,12 +130,22 @@ public class AnnotationProcessorUtils {
 		return TypeCategory.ATTRIBUTE;
 	}
 
-	public static boolean isFieldJPAAEntity(Element el) {
-
-		if ((el.getAnnotation(OneToOne.class) != null) || (el.getAnnotation(Embedded.class) != null)) {
-			return true;
+	public static boolean isFieldJPAAEntity(ProcessingEnvironment processingEnv, Element el) {	
+		
+		boolean jpaEntity = false;
+		
+		TypeMirror type = AnnotationProcessorUtils.getDeclaredType(el);		
+		TypeElement typeElement = (TypeElement) processingEnv.getTypeUtils().asElement(type);
+		if (typeElement != null) {
+			if (isJPAAnnotated(typeElement)){
+				jpaEntity = true;
+			}
+			if (getPersistentSupertype(processingEnv, typeElement) != null && isJPAAnnotated(getPersistentSupertype(processingEnv, typeElement))) {
+				jpaEntity = true;
+			}
 		}
-		return false;
+
+		return jpaEntity;
 	}
 
 	/**
@@ -150,6 +157,9 @@ public class AnnotationProcessorUtils {
 	 * @return Whether it is to be considered a JPA annotated class
 	 */
 	public static boolean isJPAAnnotated(Element el) {
+		if (el == null) {
+			return false;
+		}
 		if ((el.getAnnotation(Entity.class) != null) || (el.getAnnotation(MappedSuperclass.class) != null)
 				|| (el.getAnnotation(Embeddable.class) != null)) {
 			return true;
@@ -420,5 +430,30 @@ public class AnnotationProcessorUtils {
 			}
 		}
 		return AnnotationProcessorUtils.getFieldMembers(el);
+	}
+	
+	/**
+	 * Method to find the next persistent supertype above this one.
+	 * 
+	 * @param processingEnv
+	 *            ProcessingEnvironment instance
+	 * @param element
+	 *            The element
+	 * @return Its next parent that is persistable (or null if no persistable
+	 *         predecessors)
+	 */
+	public static TypeElement getPersistentSupertype(ProcessingEnvironment processingEnv, TypeElement element) {
+		TypeMirror superType = element.getSuperclass();
+		if (superType == null || "java.lang.Object".equals(element.toString())) {
+			return null;
+		}
+
+		TypeElement superElement = (TypeElement) processingEnv.getTypeUtils().asElement(superType);
+		if (AnnotationProcessorUtils.isJPAAnnotated(superElement)) {
+			return superElement;
+		} if (superElement == null) {
+			return null;
+		}
+		return getPersistentSupertype(processingEnv, superElement);
 	}
 }

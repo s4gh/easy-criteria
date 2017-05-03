@@ -161,7 +161,7 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 
 	private void generateMetaModelDataForClass(TypeElement el, Writer w, String classSimpleName) throws IOException {
 
-		TypeElement superEl = getPersistentSupertype(el);
+		TypeElement superEl = AnnotationProcessorUtils.getPersistentSupertype(processingEnv, el);
 		Map<String, TypeMirror> genericLookups = getGenericLookups(el);
 		if (superEl != null) {
 			generateMetaModelDataForClass(superEl, w, classSimpleName);
@@ -218,8 +218,8 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 					TypeMirror type = AnnotationProcessorUtils.getDeclaredType(member);
 					TypeCategory cat = null;
 					String memberName = AnnotationProcessorUtils.getMemberName(member);
-
-					if (AnnotationProcessorUtils.isFieldJPAAEntity(member)) {
+					
+					if (AnnotationProcessorUtils.isFieldJPAAEntity(processingEnv, member)) {
 						cat = TypeCategory.JPA_ENTITY_ATTRIBUTE;
 						writePropertyAsEntity(w, type, memberName);
 					} else {
@@ -342,26 +342,26 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 		return param;
 	}
 
-	/**
-	 * Method to find the next persistent supertype above this one.
-	 * 
-	 * @param element
-	 *            The element
-	 * @return Its next parent that is persistable (or null if no persistable
-	 *         predecessors)
-	 */
-	public TypeElement getPersistentSupertype(TypeElement element) {
-		TypeMirror superType = element.getSuperclass();
-		if (superType == null || "java.lang.Object".equals(element.toString())) {
-			return null;
-		}
-
-		TypeElement superElement = (TypeElement) processingEnv.getTypeUtils().asElement(superType);
-		if (AnnotationProcessorUtils.isJPAAnnotated(superElement)) {
-			return superElement;
-		}
-		return getPersistentSupertype(superElement);
-	}
+//	/**
+//	 * Method to find the next persistent supertype above this one.
+//	 * 
+//	 * @param element
+//	 *            The element
+//	 * @return Its next parent that is persistable (or null if no persistable
+//	 *         predecessors)
+//	 */
+//	public TypeElement getPersistentSupertype(TypeElement element) {
+//		TypeMirror superType = element.getSuperclass();
+//		if (superType == null || "java.lang.Object".equals(element.toString())) {
+//			return null;
+//		}
+//
+//		TypeElement superElement = (TypeElement) processingEnv.getTypeUtils().asElement(superType);
+//		if (AnnotationProcessorUtils.isJPAAnnotated(superElement)) {
+//			return superElement;
+//		}
+//		return getPersistentSupertype(superElement);
+//	}
 
 	@Override
 	public SourceVersion getSupportedSourceVersion() {
