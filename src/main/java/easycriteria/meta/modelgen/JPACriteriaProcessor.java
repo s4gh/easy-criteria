@@ -342,27 +342,6 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 		return param;
 	}
 
-//	/**
-//	 * Method to find the next persistent supertype above this one.
-//	 * 
-//	 * @param element
-//	 *            The element
-//	 * @return Its next parent that is persistable (or null if no persistable
-//	 *         predecessors)
-//	 */
-//	public TypeElement getPersistentSupertype(TypeElement element) {
-//		TypeMirror superType = element.getSuperclass();
-//		if (superType == null || "java.lang.Object".equals(element.toString())) {
-//			return null;
-//		}
-//
-//		TypeElement superElement = (TypeElement) processingEnv.getTypeUtils().asElement(superType);
-//		if (AnnotationProcessorUtils.isJPAAnnotated(superElement)) {
-//			return superElement;
-//		}
-//		return getPersistentSupertype(superElement);
-//	}
-
 	@Override
 	public SourceVersion getSupportedSourceVersion() {
 		return SourceVersion.latest();
