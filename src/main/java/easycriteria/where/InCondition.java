@@ -1,6 +1,7 @@
 package easycriteria.where;
 
 import java.util.Collection;
+import java.util.Map;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
@@ -28,7 +29,7 @@ public class InCondition<A> extends WhereCondition {
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
+	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path, Map<String, Path> queryParts) {
 
 		Predicate inConditionPredicate = path.get(attribute).in(args);
 		if (!positiveCondition) {

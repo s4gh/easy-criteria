@@ -43,8 +43,7 @@ public class EasyCriteriaQueryInheritanceTest {
 		
 		List<LargeProject> projects1 = new JPAQuery(entityManager).select(LargeProject.class)
 				.join(largeProject.homeAnimal, JoinType.INNER, homeAnimal)
-					.on(homeAnimal.owner.eq("owner1"))
-				.endJoin()
+				.where(homeAnimal.owner.eq("owner1"))
 				.getResultList();
 		assertEquals(1, projects1.size());	
 	}

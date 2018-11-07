@@ -1,6 +1,7 @@
 package easycriteria.where;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
@@ -23,19 +24,22 @@ public abstract class WhereCondition {
 		return new OrCondition(this, otherCondition);
 	}
 
-	protected abstract Predicate buildJPAPredicate(CriteriaBuilder builder, @SuppressWarnings("rawtypes") Path root);
+	protected abstract Predicate buildJPAPredicate(CriteriaBuilder builder, @SuppressWarnings("rawtypes") Path root,
+                                                 Map<String, Path> queryParts);
 	
 	@SuppressWarnings("rawtypes")
-	public Predicate buildPredicate(CriteriaBuilder builder, Path root){
+	public Predicate buildPredicate(CriteriaBuilder builder, Path root, Map<String, Path> queryParts){
 		if (parentPath == null) {
 			parentPath = root;
 		}
 
-		if (parentAttribute != null && parentAttribute.getParent() != null) {
+		if (parentAttribute != null && queryParts.containsKey(parentAttribute.getAttribute())) {
+			parentPath = queryParts.get(parentAttribute.getAttribute());
+		} else if (parentAttribute != null && parentAttribute.getParent() != null) {
 			parentPath = buildParentPath(root, parentAttribute);
 		}
 		
-		return buildJPAPredicate(builder , parentPath);
+		return buildJPAPredicate(builder , parentPath, queryParts);
 	}
 	
 	@SuppressWarnings("rawtypes")

@@ -1,5 +1,7 @@
 package easycriteria.where;
 
+import java.util.Map;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
@@ -18,7 +20,7 @@ public class CollectionSizeEqualsCondition extends WhereCondition {
 
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {		
+	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path, Map<String, Path> queryParts) {
 		return builder.equal(builder.size(path.get(attribute)), size);
 	}
 
