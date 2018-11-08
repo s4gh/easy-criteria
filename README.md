@@ -113,8 +113,7 @@ QHomeAnimal_ homeAnimal = new QHomeAnimal_();
 
 List<LargeProject> projects = query.select(LargeProject.class)
 				.join(largeProject.homeAnimal, JoinType.INNER, homeAnimal)
-					.on(homeAnimal.owner.eq("owner1"))
-				.endJoin()
+				.where(homeAnimal.owner.eq("owner1"))
 				.getResultList();
 ```
 In this example when we perform join ```join(largeProject.homeAnimal, JoinType.INNER, homeAnimal)``` we specify join type ```JoinType.INNER``` and join table alias ```homeAnimal``` which is later used to filter results.
