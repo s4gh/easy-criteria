@@ -23,6 +23,7 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.persistence.AccessType;
@@ -50,7 +51,7 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.annotation.processing.AbstractProcessor#process(java.util.Set,
 	 * javax.annotation.processing.RoundEnvironment)
 	 */
@@ -80,7 +81,7 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 	/**
 	 * Handler for processing a JPA annotated class to create the criteria class
 	 * stub.
-	 * 
+	 *
 	 * @param el
 	 *            The class element
 	 */
@@ -218,7 +219,7 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 					TypeMirror type = AnnotationProcessorUtils.getDeclaredType(member);
 					TypeCategory cat = null;
 					String memberName = AnnotationProcessorUtils.getMemberName(member);
-					
+
 					if (AnnotationProcessorUtils.isFieldJPAAEntity(processingEnv, member)) {
 						cat = TypeCategory.JPA_ENTITY_ATTRIBUTE;
 						writePropertyAsEntity(w, type, memberName);
@@ -245,12 +246,20 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 
 	private void writePropertyAttribute(String classSimpleName, Map<String, TypeMirror> genericLookups, Writer w,
 			Element member, TypeMirror type, TypeCategory cat, String memberName) throws IOException {
-		
+
 		String typeName = type.toString();
-		
+
 		w.append(CODE_INDENT).append("public " + cat.getTypeName()).append("<" + classSimpleName + ", ");
 		if (cat == TypeCategory.ATTRIBUTE || cat == TypeCategory.DATE_ATTRIBUTE || cat == TypeCategory.NUMBER_ATTRIBUTE
 				|| cat == TypeCategory.STRING_ATTRIBUTE) {
+			if (type.getKind() == TypeKind.DECLARED && type instanceof DeclaredType && type instanceof TypeVariable)
+			{
+				// This was needed to detect such as a field with a Bean Validation 2.0 @NotNull, which comes through as
+				// "(@javax.validation.constraints.NotNull :: theUserType)", so this converts that to "theUserType".
+				// TODO Is this the best way to trap that case ? (i.e "TypeVariable")?! probably not, so find a better way
+				// Note that this is also a WildcardType, ReferenceType, ArrayType
+				type = ((DeclaredType)type).asElement().asType();
+			}
 			if (type instanceof PrimitiveType) {
 				if (type.toString().equals("long")) {
 					typeName = "Long";
@@ -270,7 +279,8 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 					typeName = "Boolean";
 				}
 				w.append(typeName);
-			} else {				
+			} else {
+				typeName = type.toString();
 				TypeMirror target = null;
 				for (int i = 0; i < annotationsWithTargetEntity.length; i++) {
 					Object targetValue = AnnotationProcessorUtils.getValueForAnnotationAttribute(member,
@@ -305,7 +315,7 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 				typeName = elementTypeName;
 			}
 		}
-		
+
 		if (cat != TypeCategory.MAP) {
 			w.append("> " + memberName + " = new " + cat.getTypeName() + "<>(\"" + memberName + "\", this, " + typeName + ".class);\n");
 		}
