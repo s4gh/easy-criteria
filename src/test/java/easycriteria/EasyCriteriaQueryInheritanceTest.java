@@ -47,8 +47,7 @@ public class EasyCriteriaQueryInheritanceTest {
 				.getResultList();
 		assertEquals(1, projects1.size());	
 	}
-	
-	
+
 	@Test
 	public void testCollectionContainsElement() {
 		
@@ -62,7 +61,7 @@ public class EasyCriteriaQueryInheritanceTest {
 		List<LargeProject> projects = query.where(largeProject.animals.contains(animals.get(0))).getResultList();		
 		assertEquals("project1", projects.get(0).getName());
 	}
-	
+
 	private void setupAnimalsTestData() {
 		beginTx();
 
