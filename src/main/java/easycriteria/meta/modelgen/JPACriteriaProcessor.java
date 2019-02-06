@@ -23,7 +23,6 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.persistence.AccessType;
@@ -294,14 +293,6 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 		w.append(CODE_INDENT).append("public " + cat.getTypeName()).append("<" + classSimpleName + ", ");
 		if (cat == TypeCategory.ATTRIBUTE || cat == TypeCategory.DATE_ATTRIBUTE || cat == TypeCategory.NUMBER_ATTRIBUTE
 				|| cat == TypeCategory.STRING_ATTRIBUTE) {
-			if (type.getKind() == TypeKind.DECLARED && type instanceof DeclaredType && type instanceof TypeVariable)
-			{
-				// This was needed to detect such as a field with a Bean Validation 2.0 @NotNull, which comes through as
-				// "(@javax.validation.constraints.NotNull :: theUserType)", so this converts that to "theUserType".
-				// TODO Is this the best way to trap that case ? (i.e "TypeVariable")?! probably not, so find a better way
-				// Note that this is also a WildcardType, ReferenceType, ArrayType
-				type = ((DeclaredType)type).asElement().asType();
-			}
 			if (type instanceof PrimitiveType) {
 				if (type.toString().equals("long")) {
 					typeName = "Long";
@@ -322,6 +313,10 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 				}
 				w.append(typeName);
 			} else {
+				// This type rerefinition was needed to detect such as a field with a Bean Validation 2.0 @NotNull, which comes through as
+				// "(@javax.validation.constraints.NotNull :: theUserType)", so this converts that to "theUserType".
+				type = ((DeclaredType)type).asElement().asType();
+
 				typeName = type.toString();
 				TypeMirror target = null;
 				for (int i = 0; i < annotationsWithTargetEntity.length; i++) {

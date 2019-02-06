@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name="address_tbl")
@@ -13,6 +14,7 @@ public class Address {
     @GeneratedValue
     private int id;
     
+    @Size(min=1, max=20)
     private String address;
 	
     public Address() {
