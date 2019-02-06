@@ -1,9 +1,14 @@
 package easycriteria;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.persistence.criteria.From;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
@@ -16,6 +21,7 @@ public class EasyCriteriaSubquery<E, T> implements WhereConditionsContainer {
 	private WhereTransformer whereTransformer;
 	private Subquery<T> criteriaSubquery;
 	private Root<E> root;
+	Map<String, Path> queryParts = new HashMap<>();
 
 	public EasyCriteriaSubquery(Subquery<T> criteriaSubquery, WhereTransformer whereTransformer, Root<E> root) {
 		this.whereClauses = new ArrayList<>();
@@ -28,17 +34,17 @@ public class EasyCriteriaSubquery<E, T> implements WhereConditionsContainer {
 		addWhereCondition(whereCondition);
 		return this;
 	}
-	
-	public <A> JoinBuilder<E, A, T, EasyCriteriaSubquery<E, T>> join(ObjectAttribute<A> attribute,
-			JoinType joinType) {
 
-		return new JoinBuilder<E, A, T, EasyCriteriaSubquery<E, T>>(attribute.getAttribute(), this, whereTransformer, joinType, root);
-	}
-	
-	public <A> JoinBuilder<E, A, T, EasyCriteriaSubquery<E, T>> join(ObjectAttribute<A> attribute,
-			JoinType joinType, ObjectAttribute<A> alias) {
-
-		return new JoinBuilder<E, A, T, EasyCriteriaSubquery<E, T>>(attribute.getAttribute(), this, whereTransformer, joinType, root);
+	public EasyCriteriaSubquery<E, T>  join(ObjectAttribute attribute, JoinType joinType, ObjectAttribute alias) {
+		Join join;
+		if (queryParts.containsKey(attribute.getParent().getAttribute())) {
+			Path path = queryParts.get(attribute.getParent().getAttribute());
+			join = ((From) path).join(attribute.getAttribute(), joinType);
+		} else {
+			join = ((From) root).join(attribute.getAttribute(), joinType);
+		}
+		queryParts.put(alias.getAttribute(),join);
+		return this;
 	}
 
 	public void addWhereCondition(WhereCondition whereClause) {
@@ -52,7 +58,7 @@ public class EasyCriteriaSubquery<E, T> implements WhereConditionsContainer {
 	}
 
 	public Subquery<T> getCriteriaSubquery() {
-		return criteriaSubquery.where(whereTransformer.transform(getWhereClauses(), getRoot()));
+		return criteriaSubquery.where(whereTransformer.transform(getWhereClauses(), getRoot(), queryParts));
 	}
 
 	public Root<E> getRoot() {

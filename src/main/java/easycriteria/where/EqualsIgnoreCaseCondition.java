@@ -1,5 +1,7 @@
 package easycriteria.where;
 
+import java.util.Map;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
@@ -23,7 +25,7 @@ public class EqualsIgnoreCaseCondition extends WhereCondition {
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path) {
+	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path path, Map<String, Path> queryParts) {
 		return builder.equal(builder.upper(path.get(attribute)), value.toUpperCase());
 	}
 

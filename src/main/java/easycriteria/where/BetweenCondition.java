@@ -1,5 +1,7 @@
 package easycriteria.where;
 
+import java.util.Map;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
@@ -20,7 +22,7 @@ public class BetweenCondition<A> extends WhereCondition {
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path root) {
+	public Predicate buildJPAPredicate(CriteriaBuilder builder, Path root, Map<String, Path> queryParts) {
 		return builder.between(parentPath.get(attribute), (Comparable) from, (Comparable) to);
 	}
 

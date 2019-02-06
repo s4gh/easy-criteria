@@ -1,6 +1,7 @@
 package easycriteria;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
@@ -17,8 +18,9 @@ public class WhereTransformer {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public Predicate[] transform(List<WhereCondition> whereClauses, Path root) {
-		return whereClauses.stream().map(whereClause -> whereClause.buildPredicate(criteriaBuilder, root))
+	public Predicate[] transform(List<WhereCondition> whereClauses, Path root,
+															 Map<String, Path> queryParts) {
+		return whereClauses.stream().map(whereClause -> whereClause.buildPredicate(criteriaBuilder, root, queryParts))
 				.toArray(size -> new Predicate[size]);
 	}
 }

@@ -13,7 +13,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Persistence;
 import javax.persistence.criteria.JoinType;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -259,9 +258,9 @@ public class EasyCriteriaQueryTest {
 	public void testNestedPropertiesCondition() {
 		setupDepartementsTestData();
 		
-		QEmployee_ employee = new QEmployee_();
-		QAddress_ address = new QAddress_();
-		QDepartment_ department = new QDepartment_();
+		QEmployee_ employee = new QEmployee_("employee", null);
+		QAddress_ address = new QAddress_("address", null);
+		QDepartment_ department = new QDepartment_("department", null);
 		
 		List<Employee> emp = new JPAQuery(entityManager).select(Employee.class)
 			.where(employee.address.address.eq("address1"))
@@ -271,8 +270,7 @@ public class EasyCriteriaQueryTest {
 		
 		List<Employee> empJoin = new JPAQuery(entityManager).select(Employee.class)
 				.join(employee.address, JoinType.INNER, address)
-					.on(address.address.eq("address1"))
-				.endJoin()				
+				.where(address.address.eq("address1"))
 				.getResultList();
 			assertEquals(2, empJoin.size());
 		
@@ -291,58 +289,70 @@ public class EasyCriteriaQueryTest {
 		assertEquals("dep_prod", departments.get(0).getName());
 				
 		List<Department> departmentsJoin = new JPAQuery(entityManager).select(Department.class)
-				.join(department.manager, JoinType.INNER)
-					.join(employee.address, JoinType.INNER, address)
-						.on(address.address.eq("address1"))
-					.endJoin()
-				.endJoin()				
+				.join(department.manager, JoinType.INNER, employee)
+				.join(employee.address, JoinType.INNER, address)
+				.where(address.address.eq("address1"))
 				.getResultList();
 		assertEquals(1, departmentsJoin.size());
 		assertEquals("dep_prod", departmentsJoin.get(0).getName());
 	}
-	
+
 	@Test
-	public void testJoins() {
+	public void testSimpleJoin() {
 		setupDepartementsTestData();
-		
-		QEmployee_ employee = new QEmployee_();
-		QAddress_ address = new QAddress_();
+
 		QDepartment_ department = new QDepartment_();
-		
-		List<Department> departments = new JPAQuery(entityManager).select(Department.class)		
-		.join(department.manager, JoinType.LEFT, employee)
-			.on(employee.fullName.eq("fullName1"))					
-		.endJoin()
-		.getResultList();		
-		assertEquals("dep_prod", departments.get(0).getName());
-		
-		
-		List<Department> departments1 = new JPAQuery(entityManager).select(Department.class)		
-				.join(department.manager, JoinType.LEFT)
-					.join(employee.address, JoinType.INNER, address)
-						.on(address.address.eq("address3"))
-					.endJoin()
-				.endJoin()
+		QEmployee_ employee = new QEmployee_("employee", department);
+		QAddress_ address = new QAddress_();
+
+		EasyCriteriaQuery<Department, Department> criteriaQuery = new JPAQuery(entityManager).select(Department.class);
+		List<Department> departments = criteriaQuery
+				.join(department.manager, JoinType.LEFT, employee)
+				.where(employee.fullName.eq("fullName1"))
 				.getResultList();
-		assertEquals("dep_sales", departments1.get(0).getName());
-		
-		List<Department> departments2 = new JPAQuery(entityManager).select(Department.class)		
+		assertEquals("dep_prod", departments.get(0).getName());
+	}
+
+	@Test
+	public void testSimpleJoinWithLikeInWhereClause() {
+		setupDepartementsTestData();
+
+		QDepartment_ department = new QDepartment_();
+		QEmployee_ employee = new QEmployee_("employee", department);
+		QAddress_ address = new QAddress_("address", employee);
+
+		List<Department> departments2 = new JPAQuery(entityManager).select(Department.class)
 				.join(department.employees, JoinType.INNER, employee)
-					.on(employee.position.like("position2%"))
-				.endJoin()
+				.where(employee.position.like("position2%"))
 				.distinct()
 				.getResultList();
 		assertEquals("dep_sales", departments2.get(0).getName());
 		assertEquals("dep_prod", departments2.get(1).getName());
 		assertEquals(2, departments2.size());
 	}
-	
+
 	@Test
+	public void testMultipleJoins() {
+		setupDepartementsTestData();
+
+		QDepartment_ department = new QDepartment_();
+		QEmployee_ employee = new QEmployee_("employee", department);
+		QAddress_ address = new QAddress_("address", employee);
+
+		List<Department> departments1 = new JPAQuery(entityManager).select(Department.class)
+				.join(department.manager, JoinType.LEFT, employee)
+				.join(employee.address, JoinType.INNER, address)
+				.where(address.address.eq("address3"))
+				.getResultList();
+		assertEquals("dep_sales", departments1.get(0).getName());
+	}
+
+		@Test
 	public void testSubquery() {
 		
 		setupDepartementsTestData();
 		
-		QEmployee_ employee = new QEmployee_();		
+		QEmployee_ employee = new QEmployee_("employee", null);
 		
 		EasyCriteriaQuery<Employee, Employee> query = new JPAQuery(entityManager).select(Employee.class);
 		EasyCriteriaSubquery<Employee, Integer> subQuery = query.subquerySelect(employee.id).where(employee.fullName.eq("fullName1"));
