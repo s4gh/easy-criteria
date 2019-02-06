@@ -28,7 +28,7 @@ public class EasyCriteriaQuery<E, S> implements WhereConditionsContainer {
 	private final Root<E> root;
 	private int offset;
 	private int rowCount;
-	Map<String, Path> queryParts = new HashMap<>();
+	private Map<String, Path> queryParts = new HashMap<>();
 
 	public EasyCriteriaQuery(CriteriaQuery<S> criteriaQuery, QueryRunner queryRunner, WhereTransformer whereTransformer,
 			OrderByTransformer<E> orderByTransformer, Root<E> root) {

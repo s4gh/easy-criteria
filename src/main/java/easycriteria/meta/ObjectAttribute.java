@@ -29,7 +29,11 @@ public class ObjectAttribute<T> implements EntityPathNode {
 	}
 
 	public String getAttribute() {
-		return attribute;
+		if (attribute != null) {
+			return attribute;
+		} else {
+			return getClass().getSimpleName();
+		}
 	}
 
 	@Override

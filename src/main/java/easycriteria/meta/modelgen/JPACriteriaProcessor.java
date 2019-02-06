@@ -118,24 +118,18 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 				w.append("");
 				w.append("{\n");
 
-				// Add constructors
+				// Add constructor
 				w.append(CODE_INDENT)
 						.append("public " + CLASS_NAME_PREFIX + classSimpleName + CLASS_NAME_SUFFIX + "() {");
 				w.append("\n");
-				w.append(CODE_INDENT).append(CODE_INDENT).append("super(null, null, ").append(classSimpleName).append(".class);");
+				w.append(CODE_INDENT).append(CODE_INDENT).append("this(null, null);");
 				w.append("\n");
 				w.append(CODE_INDENT).append("}");
 				w.append("\n");
 
-				w.append(CODE_INDENT).append("public " + CLASS_NAME_PREFIX + classSimpleName + CLASS_NAME_SUFFIX
-						+ "(String attribute, EntityPathNode parent) {");
-				w.append("\n");
-				w.append(CODE_INDENT).append(CODE_INDENT).append("super(attribute, parent, ").append(classSimpleName).append(".class);");;
-				w.append("\n");
-				w.append(CODE_INDENT).append("}");
-				w.append("\n");
-
-				generateMetaModelDataForClass(el, w, classSimpleName);
+				Map<String, TypeMirror> jpaEntityProperties = new HashMap<>();
+				generateMetaModelDataForClass(el, w, classSimpleName, jpaEntityProperties);
+				writeConstructorsAccountingForJPAInits(w, classSimpleName, jpaEntityProperties);
 
 				w.append("}\n");
 				w.flush();
@@ -160,19 +154,65 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 		return genericLookups;
 	}
 
-	private void generateMetaModelDataForClass(TypeElement el, Writer w, String classSimpleName) throws IOException {
+	private void generateMetaModelDataForClass(TypeElement el, Writer w, String classSimpleName, Map<String, TypeMirror> jpaEntityProperties) throws IOException {
 
 		TypeElement superEl = AnnotationProcessorUtils.getPersistentSupertype(processingEnv, el);
 		Map<String, TypeMirror> genericLookups = getGenericLookups(el);
 		if (superEl != null) {
-			generateMetaModelDataForClass(superEl, w, classSimpleName);
+			generateMetaModelDataForClass(superEl, w, classSimpleName, jpaEntityProperties);
 		}
 
 		List<? extends Element> members = getClassMembers(el);
 
 		if (members != null) {
-			processClassMembers(classSimpleName, genericLookups, w, members);
+			processClassMembers(classSimpleName, genericLookups, w, members, jpaEntityProperties);
 		}
+	}
+
+	private void writeConstructorsAccountingForJPAInits(Writer w, String classSimpleName,
+			Map<String, TypeMirror> jpaEntityProperties) throws IOException {
+
+		// JPA entity properties require special initialization to handle tree like
+		// structures and circular dependencies. Initialization is limited to 3 levels
+
+		w.append(CODE_INDENT).append("private static InstancesInits inits = InstancesInits.DIRECT2;");
+		w.append("\n");
+
+		w.append(CODE_INDENT).append("public " + CLASS_NAME_PREFIX + classSimpleName + CLASS_NAME_SUFFIX
+				+ "(String attribute, EntityPathNode parent) {");
+		w.append("\n");
+		w.append(CODE_INDENT).append(CODE_INDENT).append("this(attribute, parent, inits);");
+		w.append("\n");
+		w.append(CODE_INDENT).append("}");
+		w.append("\n");
+
+		// write constructor with inits start
+		w.append(CODE_INDENT).append("public " + CLASS_NAME_PREFIX + classSimpleName + CLASS_NAME_SUFFIX
+				+ "(String attribute, EntityPathNode parent, InstancesInits inits) {");
+		w.append("\n");
+		w.append(CODE_INDENT).append(CODE_INDENT).append("super(attribute, parent, ").append(classSimpleName)
+				.append(".class);");
+		w.append("\n");
+
+		// write jpa entities initialization
+		for (String memberName : jpaEntityProperties.keySet()) {
+
+			TypeMirror type = jpaEntityProperties.get(memberName);
+			String pkgName = type.toString().substring(0, type.toString().lastIndexOf('.'));
+			String entitySimpleName = type.toString().substring(type.toString().lastIndexOf('.') + 1);
+			String classNameNew = pkgName + "." + CLASS_NAME_PREFIX + entitySimpleName + CLASS_NAME_SUFFIX;
+
+			w.append(CODE_INDENT).append(CODE_INDENT)
+					.append("this." + memberName + " = inits.isInitialized(\"" + memberName + "\") ");
+			w.append("? new ").append(classNameNew)
+					.append("(\"" + memberName + "\", this, inits.get(\"" + memberName + "\")) : null;");
+			w.append("\n");
+		}
+
+		// write constructor end
+		w.append(CODE_INDENT).append("}");
+		w.append("\n");
+
 	}
 
 	private List<? extends Element> getClassMembers(TypeElement el) {
@@ -195,8 +235,9 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 	}
 
 	private void processClassMembers(String classSimpleName, Map<String, TypeMirror> genericLookups, Writer w,
-			List<? extends Element> members) throws IOException {
+			List<? extends Element> members, Map<String, TypeMirror> jpaEntityProperties) throws IOException {
 		Iterator<? extends Element> iter = members.iterator();
+
 		while (iter.hasNext()) {
 			Element member = iter.next();
 			boolean isTransient = false;
@@ -222,6 +263,7 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 
 					if (AnnotationProcessorUtils.isFieldJPAAEntity(processingEnv, member)) {
 						cat = TypeCategory.JPA_ENTITY_ATTRIBUTE;
+						jpaEntityProperties.put(memberName, type);
 						writePropertyAsEntity(w, type, memberName);
 					} else {
 						String typeName = AnnotationProcessorUtils.getDeclaredTypeName(processingEnv, type, true);
@@ -240,7 +282,7 @@ public class JPACriteriaProcessor extends AbstractProcessor {
 		String classNameNew = pkgName + "." + CLASS_NAME_PREFIX + entitySimpleName + CLASS_NAME_SUFFIX;
 
 		w.append(CODE_INDENT + "public " + classNameNew);
-		w.append(" " + memberName + " = new " + classNameNew + "(\"" + memberName + "\", this);");
+		w.append(" " + memberName + ";");
 		w.append("\n");
 	}
 

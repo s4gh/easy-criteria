@@ -336,18 +336,20 @@ public class EasyCriteriaQueryTest {
 		setupDepartementsTestData();
 
 		QDepartment_ department = new QDepartment_();
-		QEmployee_ employee = new QEmployee_("employee", department);
-		QAddress_ address = new QAddress_("address", employee);
+		QEmployee_ employee = new QEmployee_();
+		QAddress_ address = new QAddress_();
+
 
 		List<Department> departments1 = new JPAQuery(entityManager).select(Department.class)
 				.join(department.manager, JoinType.LEFT, employee)
 				.join(employee.address, JoinType.INNER, address)
 				.where(address.address.eq("address3"))
-				.getResultList();
+				.getResultList();	
+
 		assertEquals("dep_sales", departments1.get(0).getName());
 	}
 
-		@Test
+	@Test
 	public void testSubquery() {
 		
 		setupDepartementsTestData();
