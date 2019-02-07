@@ -20,7 +20,7 @@ Add dependency to your project:
 <dependency>
     <groupId>io.github.sveryovka</groupId>
     <artifactId>easy-criteria</artifactId>
-    <version>2.0.2</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 ## Generate Metamodel
