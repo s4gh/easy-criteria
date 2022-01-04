@@ -25,17 +25,17 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import javax.persistence.AccessType;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Transient;
+import jakarta.persistence.AccessType;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Transient;
 import javax.tools.JavaFileObject;
 
 import easycriteria.meta.modelgen.AnnotationProcessorUtils.TypeCategory;
 
-@SupportedAnnotationTypes({ "javax.persistence.Entity", "javax.persistence.Embeddable", "javax.persistence.MappedSuperclass" })
+@SupportedAnnotationTypes({ "jakarta.persistence.Entity", "jakarta.persistence.Embeddable", "jakarta.persistence.MappedSuperclass" })
 public class JPACriteriaProcessor extends AbstractProcessor {
 	private static final String CLASS_NAME_SUFFIX = "_";
 	private static final String CLASS_NAME_PREFIX = "Q";
