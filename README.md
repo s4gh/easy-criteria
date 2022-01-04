@@ -10,7 +10,7 @@ List<Employee> employees = query.select(Employee.class)
 ```
 Design goals used during creation of this library:
 * Reuse all available JPA functionality and infrastructure
-* Be simple and minimalistic so that any developer was able to change library code just after few hours of code investigation. Version 1.x used JPA metamodel which imposes serious limitations on the possible query syntax. Version 2.x work with own custom generated metamodel. Main motivation for generating own metamodel is to improve query syntax compared to version 1.x. 
+* Be simple and minimalistic so that any developer was able to change library code just after few hours of code investigation. Version 1.x used JPA metamodel which imposes serious limitations on the possible query syntax. Version 2.x works with own custom generated metamodel. Main motivation for generating own metamodel is to improve query syntax compared to version 1.x. Version 3.x has swicthed to Jakarta JPA packages
 * Provide simpler, more convenient and shorter syntax compared to JPA Criteria API 
 
 # Quick Start
