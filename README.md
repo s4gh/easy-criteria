@@ -20,7 +20,7 @@ Add dependency to your project:
 <dependency>
     <groupId>io.github.sveryovka</groupId>
     <artifactId>easy-criteria</artifactId>
-    <version>2.1.0</version>
+    <version>3.0.0</version>
 </dependency>
 ```
 ## Generate Metamodel
@@ -137,4 +137,5 @@ If you are looking for typesafe ways to execute SQL queries in Java please also 
 * [jOOQ](https://www.jooq.org/)
 * [Torpedo Query](http://torpedoquery.org)
 * [Blaze-persistence](https://github.com/Blazebit/blaze-persistence)
+* [Ebean ORM](https://ebean.io/)
 
